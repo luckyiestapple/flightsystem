@@ -287,7 +287,7 @@ abstract class ResourceController extends BaseController
         $model = $this->model();
 
         if (! $model->insert($payload, false)) {
-            return $this->respond(['errors' => $model->errors()], 422);
+            return $this->respond(['message' => 'Gagal menyimpan data.'], 500);
         }
 
         $record = $model->find($payload[$this->primaryKey]);
