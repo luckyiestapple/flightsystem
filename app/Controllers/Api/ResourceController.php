@@ -4,6 +4,7 @@ namespace App\Controllers\Api;
 
 use App\Controllers\BaseController;
 use CodeIgniter\API\ResponseTrait;
+use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Model;
 use JsonException;
@@ -333,6 +334,20 @@ abstract class ResourceController extends BaseController
             $errors[$field] = 'Field tidak dikenal atau tidak dapat diubah.';
         }
 
+        foreach ($payload as $field => $value) {
+            if (! in_array($field, $this->writableFields, true)) {
+                continue;
+            }
+
+            if (is_string($value) && trim($value) === '') {
+                $errors[$field] = 'Field tidak boleh kosong.';
+            } elseif ($value === null && ! in_array($field, $this->nullableFields, true)) {
+                $errors[$field] = 'Field tidak boleh null.';
+            } elseif ($value !== null && ! is_scalar($value)) {
+                $errors[$field] = 'Field harus berupa nilai scalar.';
+            }
+        }
+
         if ($payload === [] && $partial) {
             $errors['_request'] = 'Body PATCH harus memiliki setidaknya satu field.';
         }
@@ -374,7 +389,7 @@ abstract class ResourceController extends BaseController
         }
 
         if ($rules !== [] && ! $this->validateData($payload, $rules)) {
-            $errors = array_merge($errors, $this->validator->getErrors());
+            $errors = array_merge($this->validator->getErrors(), $errors);
         }
 
         return array_merge($errors, $this->recordErrors(array_merge($existing ?? [], $payload)));
