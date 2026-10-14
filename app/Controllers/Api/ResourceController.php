@@ -15,11 +15,57 @@ abstract class ResourceController extends BaseController
     protected array $requiredFields = [];
     protected array $validationRules = [];
 
+    public function index(): ResponseInterface
+    {
+        $pagination = $this->pagination();
+
+        if ($pagination instanceof ResponseInterface) {
+            return $pagination;
+        }
+
+        [$page, $perPage] = $pagination;
+        $builder = $this->model()->builder();
+        $total = $builder->countAllResults(false);
+        $records = $builder
+            ->get($perPage, ($page - 1) * $perPage)
+            ->getResultArray();
+
+        return $this->respond([
+            'data' => $records,
+            'meta' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'total_pages' => (int) ceil($total / $perPage),
+            ],
+        ]);
+    }
+
     protected function model(): Model
     {
         $modelClass = $this->modelClass;
 
         return new $modelClass();
+    }
+
+    protected function pagination(): array|ResponseInterface
+    {
+        $page = $this->request->getGet('page') ?? 1;
+        $perPage = $this->request->getGet('per_page') ?? 20;
+
+        if (
+            filter_var($page, FILTER_VALIDATE_INT) === false
+            || filter_var($perPage, FILTER_VALIDATE_INT) === false
+            || (int) $page < 1
+            || (int) $perPage < 1
+            || (int) $perPage > 100
+        ) {
+            return $this->respond([
+                'message' => 'Parameter page harus >= 1 dan per_page harus berada di antara 1 sampai 100.',
+            ], 400);
+        }
+
+        return [(int) $page, (int) $perPage];
     }
 
     public function create(): ResponseInterface
