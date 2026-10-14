@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Config\Database;
 use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\FeatureTestTrait;
@@ -139,6 +140,15 @@ final class ApiResourceTest extends CIUnitTestCase
         $result->assertJSONFragment([
             'message' => 'Parameter page harus >= 1 dan per_page harus berada di antara 1 sampai 100.',
         ]);
+    }
+
+    public function testDatabaseConfigReadsUsernameFromEnvironmentFile(): void
+    {
+        $config = new Database();
+
+        $this->assertSame(env('database.default.username'), $config->default['username']);
+        $this->assertNotSame('', $config->default['username']);
+        $this->assertSame('Postgre', $config->default['DBDriver']);
     }
 
     private function attachAirlinesTable(): BaseConnection

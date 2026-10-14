@@ -189,6 +189,10 @@ class Database extends Config
     {
         parent::__construct();
 
+        if (! is_file(ROOTPATH . '.env') && is_file(ROOTPATH . 'env')) {
+            (new \CodeIgniter\Config\DotEnv(ROOTPATH, 'env'))->load();
+        }
+
         $this->default = array_merge($this->default, [
             'DSN'      => env('database.default.DSN', ''),
             'hostname' => env('database.default.hostname', 'localhost'),

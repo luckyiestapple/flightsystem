@@ -8,8 +8,8 @@ Semua endpoint menggunakan prefix `/api/flights`.
 
 Migration saat ini ditulis khusus untuk PostgreSQL dan membuat schema
 `airport_operations`. Konfigurasi koneksi `default` membaca nilai berikut dari
-file `env` (salin `env` menjadi `.env` jika proyek Anda belum memakai file
-environment):
+environment. CI4 memuat `.env` seperti biasa; jika `.env` tidak ada, konfigurasi
+database proyek ini memuat file `env`:
 
 ```ini
 database.default.hostname = localhost
