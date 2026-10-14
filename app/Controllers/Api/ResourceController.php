@@ -56,6 +56,43 @@ abstract class ResourceController extends BaseController
         return $this->respond(['data' => $record]);
     }
 
+    public function update(string $id): ResponseInterface
+    {
+        if (! $this->isUuid($id)) {
+            return $this->respond(['message' => 'Data tidak ditemukan.'], 404);
+        }
+
+        $model = $this->model();
+        $record = $model->find($id);
+
+        if ($record === null) {
+            return $this->respond(['message' => 'Data tidak ditemukan.'], 404);
+        }
+
+        $payload = $this->jsonPayload();
+
+        if ($payload instanceof ResponseInterface) {
+            return $payload;
+        }
+
+        $errors = $this->payloadErrors($payload, false, $id);
+
+        if ($errors !== []) {
+            return $this->respond(['errors' => $errors], 422);
+        }
+
+        $payload = $this->withUpdatedTimestamp($payload);
+
+        if (! $model->update($id, $payload)) {
+            return $this->respond(['message' => 'Gagal memperbarui data.'], 500);
+        }
+
+        return $this->respond([
+            'data' => $model->find($id),
+            'message' => 'Data berhasil diperbarui.',
+        ]);
+    }
+
     protected function model(): Model
     {
         $modelClass = $this->modelClass;
@@ -130,7 +167,7 @@ abstract class ResourceController extends BaseController
         return (array) $payload;
     }
 
-    protected function payloadErrors(array $payload, bool $partial = false): array
+    protected function payloadErrors(array $payload, bool $partial = false, ?string $id = null): array
     {
         $errors = [];
         $unknownFields = array_diff(array_keys($payload), $this->writableFields);
@@ -151,10 +188,27 @@ abstract class ResourceController extends BaseController
             }
 
             if (! $partial && in_array($field, $this->requiredFields, true)) {
-                $rules[$field] = 'required|' . $this->validationRules[$field];
+                $rule = 'required|' . $this->validationRules[$field];
             } elseif (isset($this->validationRules[$field])) {
-                $rules[$field] = 'permit_empty|' . $this->validationRules[$field];
+                $rule = 'permit_empty|' . $this->validationRules[$field];
+            } else {
+                continue;
             }
+
+            if ($id !== null) {
+                $rule = preg_replace_callback(
+                    '/is_unique\[([^\]]+)\]/',
+                    fn (array $matches): string => sprintf(
+                        'is_unique[%s,%s,%s]',
+                        $matches[1],
+                        $this->primaryKey,
+                        $id,
+                    ),
+                    $rule,
+                );
+            }
+
+            $rules[$field] = $rule;
         }
 
         if ($rules !== [] && ! $this->validateData($payload, $rules)) {
@@ -176,6 +230,15 @@ abstract class ResourceController extends BaseController
         $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80);
 
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
+    }
+
+    protected function withUpdatedTimestamp(array $payload): array
+    {
+        if (in_array($this->primaryKey, ['airport_id', 'flight_id'], true)) {
+            $payload['updated_at'] = date('Y-m-d H:i:s');
+        }
+
+        return $payload;
     }
 
     protected function isUuid(string $value): bool
