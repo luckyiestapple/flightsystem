@@ -38,6 +38,19 @@ Accept: application/json
 API ini belum memasang autentikasi atau otorisasi. Pasang filter autentikasi
 sebelum mengekspos endpoint ke jaringan publik.
 
+## Uji coba langsung
+
+Panduan dan berkas uji coba yang dapat langsung dipakai:
+
+- [Contoh cURL untuk PowerShell](./curl.md)
+- [Koleksi Postman v2.1](./postman_collection.json) — impor JSON ini ke Postman,
+  lalu jalankan request sesuai urutan di Collection Runner.
+
+Kedua panduan menggunakan resource `airlines`, membuat record pengujian sendiri,
+dan memakai ID yang dikembalikan API untuk detail, edit, PATCH, serta delete.
+Jalankan terhadap database pengujian atau lingkungan lokal karena request delete
+menghapus record yang dibuat selama uji coba.
+
 ## Daftar endpoint
 
 `{resource}` adalah salah satu dari `airlines`, `airports`, `routes`, atau
