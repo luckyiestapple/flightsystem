@@ -47,6 +47,30 @@ final class Flights extends ResourceController
         'estimated_arrival',
         'actual_arrival',
     ];
+    protected array $searchableFields = ['flight_number', 'flight_status'];
+    protected array $filterableFields = [
+        'flight_number',
+        'airline_id',
+        'aircraft_id',
+        'route_id',
+        'departure_gate_id',
+        'arrival_gate_id',
+        'flight_status',
+        'scheduled_departure',
+        'estimated_departure',
+        'actual_departure',
+        'scheduled_arrival',
+        'estimated_arrival',
+        'actual_arrival',
+    ];
+    protected array $sortableFields = [
+        'flight_number',
+        'flight_status',
+        'scheduled_departure',
+        'scheduled_arrival',
+        'created_at',
+        'updated_at',
+    ];
     protected array $validationRules = [
         'flight_number' => 'max_length[20]',
         'airline_id' => 'is_not_unique[airport_operations.airlines.airline_id]',

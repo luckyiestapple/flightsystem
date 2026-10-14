@@ -3,12 +3,15 @@
 namespace App\Controllers\Api;
 
 use App\Controllers\BaseController;
+use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Model;
 use JsonException;
 
 abstract class ResourceController extends BaseController
 {
+    use ResponseTrait;
+
     protected string $modelClass;
     protected string $primaryKey;
     protected array $writableFields = [];
@@ -17,8 +20,21 @@ abstract class ResourceController extends BaseController
     protected array $nullableFields = [];
     protected array $validationRules = [];
     protected array $references = [];
+    protected array $searchableFields = [];
+    protected array $filterableFields = [];
+    protected array $sortableFields = [];
 
     public function index(): ResponseInterface
+    {
+        return $this->listing();
+    }
+
+    public function search(): ResponseInterface
+    {
+        return $this->listing();
+    }
+
+    protected function listing(): ResponseInterface
     {
         $pagination = $this->pagination();
 
@@ -28,6 +44,67 @@ abstract class ResourceController extends BaseController
 
         [$page, $perPage] = $pagination;
         $builder = $this->model()->builder();
+        $query = $this->request->getGet('q');
+
+        if ($query !== null) {
+            if (! is_string($query)) {
+                return $this->respond(['message' => 'Parameter q harus berupa teks.'], 400);
+            }
+
+            if ($query !== '' && $this->searchableFields === []) {
+                return $this->respond(['message' => 'Pencarian teks tidak tersedia untuk resource ini.'], 400);
+            }
+
+            if ($query !== '') {
+                $builder->groupStart();
+
+                foreach ($this->searchableFields as $index => $field) {
+                    if ($index === 0) {
+                        $builder->like($field, $query, 'both', null, true);
+                    } else {
+                        $builder->orLike($field, $query, 'both', null, true);
+                    }
+                }
+
+                $builder->groupEnd();
+            }
+        }
+
+        $filters = $this->request->getGet('filter') ?? [];
+
+        if (! is_array($filters)) {
+            return $this->respond(['message' => 'Parameter filter harus berupa object field=nilai.'], 400);
+        }
+
+        foreach ($filters as $field => $value) {
+            if (! in_array($field, $this->filterableFields, true)) {
+                return $this->respond([
+                    'message' => sprintf('Field filter "%s" tidak didukung.', $field),
+                ], 400);
+            }
+
+            if (! is_string($value) && ! is_numeric($value)) {
+                return $this->respond([
+                    'message' => sprintf('Nilai filter "%s" harus berupa scalar.', $field),
+                ], 400);
+            }
+
+            $builder->where($field, $value);
+        }
+
+        $sort = $this->request->getGet('sort');
+        $order = $this->request->getGet('order') ?? 'ASC';
+
+        if ($sort !== null && (! is_string($sort) || ! in_array($sort, $this->sortableFields, true))) {
+            return $this->respond(['message' => 'Field sort tidak didukung.'], 400);
+        }
+
+        if (! is_string($order) || ! in_array(strtoupper($order), ['ASC', 'DESC'], true)) {
+            return $this->respond(['message' => 'Parameter order hanya boleh ASC atau DESC.'], 400);
+        }
+
+        $order = strtoupper($order);
+        $builder->orderBy($sort ?? $this->primaryKey, $order);
         $total = $builder->countAllResults(false);
         $records = $builder
             ->get($perPage, ($page - 1) * $perPage)

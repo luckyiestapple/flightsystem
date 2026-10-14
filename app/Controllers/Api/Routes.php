@@ -26,6 +26,19 @@ final class Routes extends ResourceController
     protected array $references = [
         'airport_operations.flights' => ['route_id'],
     ];
+    protected array $filterableFields = [
+        'origin_airport_id',
+        'destination_airport_id',
+        'distance_km',
+        'estimated_duration_minutes',
+    ];
+    protected array $sortableFields = [
+        'origin_airport_id',
+        'destination_airport_id',
+        'distance_km',
+        'estimated_duration_minutes',
+        'created_at',
+    ];
 
     protected function recordErrors(array $payload): array
     {

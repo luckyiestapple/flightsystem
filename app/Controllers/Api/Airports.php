@@ -29,4 +29,16 @@ final class Airports extends ResourceController
     protected array $references = [
         'airport_operations.routes' => ['origin_airport_id', 'destination_airport_id'],
     ];
+    protected array $searchableFields = ['airport_code', 'airport_name', 'city', 'country', 'timezone'];
+    protected array $filterableFields = ['airport_code', 'city', 'country', 'timezone', 'status'];
+    protected array $sortableFields = [
+        'airport_code',
+        'airport_name',
+        'city',
+        'country',
+        'timezone',
+        'status',
+        'created_at',
+        'updated_at',
+    ];
 }

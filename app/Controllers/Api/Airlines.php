@@ -22,4 +22,7 @@ final class Airlines extends ResourceController
     protected array $references = [
         'airport_operations.flights' => ['airline_id'],
     ];
+    protected array $searchableFields = ['airline_code', 'airline_name', 'country', 'contact'];
+    protected array $filterableFields = ['airline_code', 'airline_name', 'country', 'status'];
+    protected array $sortableFields = ['airline_code', 'airline_name', 'country', 'status', 'created_at'];
 }
