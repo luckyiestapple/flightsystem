@@ -21,6 +21,8 @@ abstract class ResourceController extends BaseController
     protected array $nullableFields = [];
     protected array $validationRules = [];
     protected array $references = [];
+    protected array $uniqueFields = [];
+    protected array $referenceFields = [];
     protected array $searchableFields = [];
     protected array $filterableFields = [];
     protected array $sortableFields = [];
@@ -345,23 +347,12 @@ abstract class ResourceController extends BaseController
                 continue;
             }
 
-            if (in_array($field, $this->nullableFields, true)) {
-                $rule = 'permit_empty|' . $this->validationRules[$field];
-            } else {
-                $rule = 'required|' . $this->validationRules[$field];
-            }
+            $fieldRules = $this->validationRules[$field] ?? '';
 
-            if ($id !== null) {
-                $rule = preg_replace_callback(
-                    '/is_unique\[([^\]]+)\]/',
-                    fn (array $matches): string => sprintf(
-                        'is_unique[%s,%s,%s]',
-                        $matches[1],
-                        $this->primaryKey,
-                        $id,
-                    ),
-                    $rule,
-                );
+            if (in_array($field, $this->nullableFields, true)) {
+                $rule = 'permit_empty|' . $fieldRules;
+            } else {
+                $rule = 'required|' . $fieldRules;
             }
 
             $rules[$field] = $rule;
@@ -369,6 +360,42 @@ abstract class ResourceController extends BaseController
 
         if ($rules !== [] && ! $this->validateData($payload, $rules)) {
             $errors = array_merge($this->validator->getErrors(), $errors);
+        }
+
+        foreach ($this->uniqueFields as $field) {
+            if (
+                ! array_key_exists($field, $payload)
+                || $payload[$field] === null
+                || ! is_scalar($payload[$field])
+                || isset($errors[$field])
+            ) {
+                continue;
+            }
+
+            $builder = $this->model()->builder()->where($field, $payload[$field]);
+
+            if ($id !== null) {
+                $builder->where($this->primaryKey . ' !=', $id);
+            }
+
+            if ($builder->countAllResults() > 0) {
+                $errors[$field] = 'Nilai field harus unik.';
+            }
+        }
+
+        foreach ($this->referenceFields as $field => [$table, $column]) {
+            if (
+                ! array_key_exists($field, $payload)
+                || $payload[$field] === null
+                || ! is_scalar($payload[$field])
+                || isset($errors[$field])
+            ) {
+                continue;
+            }
+
+            if (db_connect()->table($table)->where($column, $payload[$field])->countAllResults() === 0) {
+                $errors[$field] = 'Data referensi tidak ditemukan.';
+            }
         }
 
         return array_merge($errors, $this->recordErrors(array_merge($existing ?? [], $payload)));

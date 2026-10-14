@@ -68,6 +68,56 @@ final class ApiResourceTest extends CIUnitTestCase
         $this->assertStringContainsString('status: Field tidak boleh null.', $body['message']);
     }
 
+    public function testCreateRejectsDuplicateAirlineCodeWithoutDatabaseConnectionError(): void
+    {
+        $db = $this->attachAirlinesTable();
+        $db->table('airport_operations.airlines')->insert([
+            'airline_id' => '850a46d0-79c0-4db4-9241-51bdaea8f57d',
+            'airline_code' => 'GA',
+        ]);
+
+        try {
+            $result = $this->withBody(json_encode([
+                'airline_code' => 'GA',
+                'airline_name' => 'Garuda Indonesia',
+                'country' => 'Indonesia',
+            ], JSON_THROW_ON_ERROR))->post('/api/flights/airlines');
+
+            $result->assertStatus(422);
+            $result->assertJSONFragment([
+                'status' => 'error',
+                'data' => null,
+            ]);
+            $this->assertStringContainsString('airline_code: Nilai field harus unik.', $result->getJSON());
+        } finally {
+            $db->query('DETACH DATABASE airport_operations');
+        }
+    }
+
+    public function testCreateRejectsUnknownAirportReferenceWithoutDatabaseConnectionError(): void
+    {
+        $db = $this->attachAirlinesTable();
+        $db->query(
+            'CREATE TABLE airport_operations.db_airports (airport_id TEXT PRIMARY KEY)',
+        );
+
+        try {
+            $result = $this->withBody(json_encode([
+                'origin_airport_id' => '850a46d0-79c0-4db4-9241-51bdaea8f57d',
+                'destination_airport_id' => '01a423ce-cc53-4c18-a522-4de8ba31b2d5',
+            ], JSON_THROW_ON_ERROR))->post('/api/flights/routes');
+
+            $result->assertStatus(422);
+            $result->assertJSONFragment([
+                'status' => 'error',
+                'data' => null,
+            ]);
+            $this->assertStringContainsString('origin_airport_id: Data referensi tidak ditemukan.', $result->getJSON());
+        } finally {
+            $db->query('DETACH DATABASE airport_operations');
+        }
+    }
+
     public function testDeleteRejectsInvalidUuid(): void
     {
         $result = $this->delete('/api/flights/airlines/not-a-uuid');

@@ -73,9 +73,7 @@ final class Flights extends ResourceController
     ];
     protected array $validationRules = [
         'flight_number' => 'max_length[20]',
-        'airline_id' => 'is_not_unique[airport_operations.airlines.airline_id]',
         'aircraft_id' => 'regex_match[/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/]',
-        'route_id' => 'is_not_unique[airport_operations.routes.route_id]',
         'departure_gate_id' => 'regex_match[/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/]',
         'arrival_gate_id' => 'regex_match[/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/]',
         'scheduled_departure' => 'valid_date[Y-m-d H:i:s]',
@@ -85,6 +83,10 @@ final class Flights extends ResourceController
         'estimated_arrival' => 'valid_date[Y-m-d H:i:s]',
         'actual_arrival' => 'valid_date[Y-m-d H:i:s]',
         'flight_status' => 'in_list[SCHEDULED,BOARDING,DELAYED,DEPARTED,ARRIVED,CANCELLED,DIVERTED]',
+    ];
+    protected array $referenceFields = [
+        'airline_id' => ['airport_operations.airlines', 'airline_id'],
+        'route_id' => ['airport_operations.routes', 'route_id'],
     ];
 
     protected function recordErrors(array $payload): array

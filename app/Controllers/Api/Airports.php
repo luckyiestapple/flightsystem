@@ -19,7 +19,7 @@ final class Airports extends ResourceController
         'status',
     ];
     protected array $validationRules = [
-        'airport_code' => 'max_length[10]|alpha_numeric|is_unique[airport_operations.airports.airport_code]',
+        'airport_code' => 'max_length[10]|alpha_numeric',
         'airport_name' => 'max_length[150]',
         'city' => 'max_length[100]',
         'country' => 'max_length[100]',
@@ -29,6 +29,7 @@ final class Airports extends ResourceController
     protected array $references = [
         'airport_operations.routes' => ['origin_airport_id', 'destination_airport_id'],
     ];
+    protected array $uniqueFields = ['airport_code'];
     protected array $searchableFields = ['airport_code', 'airport_name', 'city', 'country', 'timezone'];
     protected array $filterableFields = ['airport_code', 'city', 'country', 'timezone', 'status'];
     protected array $sortableFields = [
