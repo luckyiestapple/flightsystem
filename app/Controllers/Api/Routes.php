@@ -21,6 +21,9 @@ final class Routes extends ResourceController
         'distance_km' => 'decimal|greater_than[0]',
         'estimated_duration_minutes' => 'integer|greater_than[0]',
     ];
+    protected array $references = [
+        'airport_operations.flights' => ['route_id'],
+    ];
 
     protected function recordErrors(array $payload): array
     {

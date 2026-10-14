@@ -18,4 +18,7 @@ final class Airports extends ResourceController
         'timezone' => 'max_length[50]',
         'status' => 'in_list[ACTIVE,INACTIVE]',
     ];
+    protected array $references = [
+        'airport_operations.routes' => ['origin_airport_id', 'destination_airport_id'],
+    ];
 }

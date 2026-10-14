@@ -17,4 +17,7 @@ final class Airlines extends ResourceController
         'contact' => 'max_length[100]',
         'status' => 'in_list[ACTIVE,INACTIVE]',
     ];
+    protected array $references = [
+        'airport_operations.flights' => ['airline_id'],
+    ];
 }

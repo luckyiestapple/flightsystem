@@ -14,6 +14,7 @@ abstract class ResourceController extends BaseController
     protected array $writableFields = [];
     protected array $requiredFields = [];
     protected array $validationRules = [];
+    protected array $references = [];
 
     public function index(): ResponseInterface
     {
@@ -90,6 +91,37 @@ abstract class ResourceController extends BaseController
         return $this->respond([
             'data' => $model->find($id),
             'message' => 'Data berhasil diperbarui.',
+        ]);
+    }
+
+    public function delete(string $id): ResponseInterface
+    {
+        if (! $this->isUuid($id)) {
+            return $this->respond(['message' => 'Data tidak ditemukan.'], 404);
+        }
+
+        $model = $this->model();
+
+        if ($model->find($id) === null) {
+            return $this->respond(['message' => 'Data tidak ditemukan.'], 404);
+        }
+
+        foreach ($this->references as $table => $fields) {
+            foreach ($fields as $field) {
+                if (db_connect()->table($table)->where($field, $id)->countAllResults() > 0) {
+                    return $this->respond([
+                        'message' => 'Data tidak dapat dihapus karena masih digunakan oleh data lain.',
+                    ], 409);
+                }
+            }
+        }
+
+        if (! $model->delete($id)) {
+            return $this->respond(['message' => 'Gagal menghapus data.'], 500);
+        }
+
+        return $this->respond([
+            'message' => 'Data berhasil dihapus.',
         ]);
     }
 
