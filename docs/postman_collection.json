@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "bd5eaf6f-e472-43f7-9f21-e0e74a4d70b8",
     "name": "Flight API - CRUD Smoke Test",
-    "description": "Uji coba CRUD airlines. Jalankan seluruh request secara berurutan di Collection Runner. Request pertama membuat data dan menyimpan airlineId untuk request selanjutnya. Base URL default: http://localhost:8080.",
+    "description": "Uji coba CRUD airlines. Jalankan seluruh request secara berurutan di Collection Runner. Request membuat dan membersihkan fixture yang diperlukan. Respons sukses berisi status numerik, message, data; respons error berisi status, error, messages.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -68,7 +68,7 @@
             "exec": [
               "pm.test('HTTP 201 Created', function () { pm.response.to.have.status(201); });",
               "const body = pm.response.json();",
-              "pm.test('Response memakai envelope standar', function () { pm.expect(Object.keys(body).sort()).to.eql(['data', 'message', 'status']); pm.expect(body.status).to.eql('success'); pm.expect(body.message).to.eql(null); });",
+              "pm.test('Response sukses sesuai envelope', function () { pm.expect(body.status).to.eql(201); pm.expect(body.message).to.eql('Data berhasil ditambahkan.'); pm.expect(body.data).to.be.an('object'); });",
               "pm.test('ID airline berhasil dibuat', function () { pm.expect(body.data.airline_id).to.be.a('string'); });",
               "pm.collectionVariables.set('airlineId', body.data.airline_id);"
             ]
@@ -96,7 +96,7 @@
             "exec": [
               "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
               "const body = pm.response.json();",
-              "pm.test('Response collection memakai envelope standar', function () { pm.expect(Object.keys(body).sort()).to.eql(['data', 'message', 'status']); pm.expect(body.status).to.eql('success'); pm.expect(body.message).to.eql(null); pm.expect(body.data).to.be.an('array'); });",
+              "pm.test('Response collection sesuai envelope', function () { pm.expect(body.status).to.eql(200); pm.expect(body.message).to.eql('Data berhasil diambil.'); pm.expect(body.data).to.be.an('array'); });",
               "pm.test('Collection memuat record yang baru dibuat', function () { pm.expect(body.data.some(function (item) { return item.airline_id === pm.collectionVariables.get('airlineId'); })).to.eql(true); });"
             ]
           }
@@ -123,7 +123,7 @@
             "exec": [
               "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
               "const body = pm.response.json();",
-              "pm.test('Detail memakai envelope standar dan ID yang benar', function () { pm.expect(Object.keys(body).sort()).to.eql(['data', 'message', 'status']); pm.expect(body.status).to.eql('success'); pm.expect(body.message).to.eql(null); pm.expect(body.data.airline_id).to.eql(pm.collectionVariables.get('airlineId')); });"
+              "pm.test('Detail sesuai envelope dan ID yang benar', function () { pm.expect(body.status).to.eql(200); pm.expect(body.message).to.eql('Data berhasil diambil.'); pm.expect(body.data.airline_id).to.eql(pm.collectionVariables.get('airlineId')); });"
             ]
           }
         }
@@ -149,7 +149,46 @@
             "exec": [
               "pm.test('HTTP 404 Not Found', function () { pm.response.to.have.status(404); });",
               "const body = pm.response.json();",
-              "pm.test('Error memakai envelope standar', function () { pm.expect(Object.keys(body).sort()).to.eql(['data', 'message', 'status']); pm.expect(body.status).to.eql('error'); pm.expect(body.data).to.eql(null); pm.expect(body.message).to.eql('Data tidak ditemukan.'); });"
+              "pm.test('404 sesuai envelope error', function () { pm.expect(body.status).to.eql(404); pm.expect(body.error).to.eql(404); pm.expect(body.messages._request).to.eql('Data tidak ditemukan.'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. POST data tidak valid (kode maskapai duplikat, 400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"airline_code\": \"{{airlineCode}}\",\n  \"airline_name\": \"Kode Duplikat\",\n  \"country\": \"Indonesia\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/flights/airlines"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400 Bad Request', function () { pm.response.to.have.status(400); });",
+              "const body = pm.response.json();",
+              "pm.test('Validasi unik ditampilkan pada field airline_code', function () { pm.expect(body.status).to.eql(400); pm.expect(body.error).to.eql(400); pm.expect(body.messages.airline_code).to.eql('Nilai field harus unik.'); });"
             ]
           }
         }
@@ -188,7 +227,7 @@
             "exec": [
               "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
               "const body = pm.response.json();",
-              "pm.test('PUT berhasil memperbarui record', function () { pm.expect(body.status).to.eql('success'); pm.expect(body.data.airline_name).to.eql('Airline Uji Coba Diperbarui'); pm.expect(body.message).to.eql(null); });"
+              "pm.test('PUT berhasil memperbarui record', function () { pm.expect(body.status).to.eql(200); pm.expect(body.message).to.eql('Data berhasil diperbarui.'); pm.expect(body.data.airline_name).to.eql('Airline Uji Coba Diperbarui'); });"
             ]
           }
         }
@@ -227,7 +266,118 @@
             "exec": [
               "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
               "const body = pm.response.json();",
-              "pm.test('PATCH hanya mengubah field yang dikirim', function () { pm.expect(body.status).to.eql('success'); pm.expect(body.data.country).to.eql('Indonesia - Uji PATCH'); pm.expect(body.data.airline_name).to.eql('Airline Uji Coba Diperbarui'); pm.expect(body.message).to.eql(null); });"
+              "pm.test('PATCH hanya mengubah field yang dikirim', function () { pm.expect(body.status).to.eql(200); pm.expect(body.message).to.eql('Data berhasil diperbarui.'); pm.expect(body.data.country).to.eql('Indonesia - Uji PATCH'); pm.expect(body.data.airline_name).to.eql('Airline Uji Coba Diperbarui'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Fixture untuk uji PUT dengan kode milik record lain",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"airline_code\": \"{{conflictingAirlineCode}}\",\n  \"airline_name\": \"Fixture Uji Konflik\",\n  \"country\": \"Indonesia\",\n  \"status\": \"ACTIVE\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/flights/airlines"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const guid = pm.variables.replaceIn('{{$guid}}').replace(/-/g, '');",
+              "pm.collectionVariables.set('conflictingAirlineCode', 'F' + guid.substring(0, 9));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Fixture berhasil dibuat', function () { pm.response.to.have.status(201); });",
+              "pm.collectionVariables.set('conflictingAirlineId', pm.response.json().data.airline_id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. PUT dengan kode maskapai milik record lain (400)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"airline_code\": \"{{conflictingAirlineCode}}\",\n  \"airline_name\": \"Airline Uji Coba Diperbarui\",\n  \"country\": \"Indonesia\",\n  \"contact\": \"+62-21-555-0101\",\n  \"status\": \"ACTIVE\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/flights/airlines/{{airlineId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400 Bad Request', function () { pm.response.to.have.status(400); });",
+              "const body = pm.response.json();",
+              "pm.test('Kode yang dipakai record lain ditolak', function () { pm.expect(body.status).to.eql(400); pm.expect(body.error).to.eql(400); pm.expect(body.messages.airline_code).to.eql('Nilai field harus unik.'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Hapus fixture konflik",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/flights/airlines/{{conflictingAirlineId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Fixture dibersihkan', function () { pm.response.to.have.status(200); });"
             ]
           }
         }
@@ -253,7 +403,124 @@
             "exec": [
               "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
               "const body = pm.response.json();",
-              "pm.test('Hasil pencarian memuat airline uji coba', function () { pm.expect(body.status).to.eql('success'); pm.expect(body.message).to.eql(null); pm.expect(body.data).to.be.an('array'); pm.expect(body.data.some(function (item) { return item.airline_code === pm.collectionVariables.get('airlineCode'); })).to.eql(true); });"
+              "pm.test('Hasil pencarian memuat airline uji coba', function () { pm.expect(body.status).to.eql(200); pm.expect(body.message).to.eql('Data berhasil diambil.'); pm.expect(body.data).to.be.an('array'); pm.expect(body.data.some(function (item) { return item.airline_code === pm.collectionVariables.get('airlineCode'); })).to.eql(true); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11a. POST tanpa body (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/flights/airlines"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400 Bad Request', function () { pm.response.to.have.status(400); });",
+              "const body = pm.response.json();",
+              "pm.test('Body kosong menghasilkan error terstruktur', function () { pm.expect(body.status).to.eql(400); pm.expect(body.error).to.eql(400); pm.expect(body.messages._request).to.eql('Body harus berupa JSON yang valid.'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11b. POST dengan object kosong (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/flights/airlines"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400 Bad Request', function () { pm.response.to.have.status(400); });",
+              "const body = pm.response.json();",
+              "pm.test('Field wajib muncul di messages', function () { pm.expect(body.status).to.eql(400); pm.expect(body.error).to.eql(400); pm.expect(body.messages).to.have.property('airline_code'); pm.expect(body.messages).to.have.property('airline_name'); pm.expect(body.messages).to.have.property('country'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11c. POST dengan JSON rusak (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/flights/airlines"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400 Bad Request', function () { pm.response.to.have.status(400); });",
+              "const body = pm.response.json();",
+              "pm.test('JSON rusak menghasilkan error terstruktur', function () { pm.expect(body.status).to.eql(400); pm.expect(body.error).to.eql(400); pm.expect(body.messages._request).to.eql('Body harus berupa JSON yang valid.'); });"
             ]
           }
         }
@@ -279,7 +546,7 @@
             "exec": [
               "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
               "const body = pm.response.json();",
-              "pm.test('Delete berhasil dan record dihapus', function () { pm.expect(body.status).to.eql('success'); pm.expect(body.data).to.eql(null); pm.expect(body.message).to.eql(null); });"
+              "pm.test('Delete berhasil dan record dihapus', function () { pm.expect(body.status).to.eql(200); pm.expect(body.message).to.eql('Data dengan id ' + pm.collectionVariables.get('airlineId') + ' berhasil dihapus.'); pm.expect(body.data).to.eql(null); });"
             ]
           }
         }
@@ -305,7 +572,7 @@
             "exec": [
               "pm.test('HTTP 404 Not Found: record sudah tidak ada', function () { pm.response.to.have.status(404); });",
               "const body = pm.response.json();",
-              "pm.test('API memastikan record sudah terhapus', function () { pm.expect(body.status).to.eql('error'); pm.expect(body.data).to.eql(null); pm.expect(body.message).to.eql('Data tidak ditemukan.'); });"
+              "pm.test('API memastikan record sudah terhapus', function () { pm.expect(body.status).to.eql(404); pm.expect(body.error).to.eql(404); pm.expect(body.messages._request).to.eql('Data tidak ditemukan.'); });"
             ]
           }
         }

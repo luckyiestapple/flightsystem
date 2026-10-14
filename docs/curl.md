@@ -47,9 +47,39 @@ $airlineId = $created.data.airline_id
 "Airline ID untuk langkah selanjutnya: $airlineId"
 ```
 
-HTTP yang diharapkan: `201 Created`, `status` bernilai `success`, dan
-`data.airline_id` terisi. Jika respons bukan sukses, periksa respons API sebelum
-melanjutkan.
+HTTP yang diharapkan: `201 Created`, `status: 201`, dan `data.airline_id`
+terisi. Jika respons bukan sukses, periksa respons API sebelum melanjutkan.
+
+## Uji validasi POST
+
+Kirim kode yang sama sekali lagi untuk memicu validasi unik. HTTP yang
+diharapkan adalah `400 Bad Request`, dengan pesan yang terpetakan pada field:
+
+```powershell
+$duplicateBody = @{
+    airline_code = $airlineCode
+    airline_name = "Kode Duplikat"
+    country      = "Indonesia"
+} | ConvertTo-Json -Compress
+
+curl.exe -i `
+    -X POST "$baseUrl/api/flights/airlines" `
+    -H "Accept: application/json" `
+    -H "Content-Type: application/json" `
+    --data-raw $duplicateBody
+```
+
+Contoh respons:
+
+```json
+{
+  "status": 400,
+  "error": 400,
+  "messages": {
+    "airline_code": "Nilai field harus unik."
+  }
+}
+```
 
 ## 3. Ambil detail data
 
@@ -69,8 +99,17 @@ $missingId = "00000000-0000-4000-8000-000000000000"
 curl.exe -i -H "Accept: application/json" "$baseUrl/api/flights/airlines/$missingId"
 ```
 
-HTTP yang diharapkan: `404 Not Found`, dengan `status: "error"` dan
-`message: "Data tidak ditemukan."`.
+HTTP yang diharapkan: `404 Not Found`:
+
+```json
+{
+  "status": 404,
+  "error": 404,
+  "messages": {
+    "_request": "Data tidak ditemukan."
+  }
+}
+```
 
 ## 5. Mengedit data (PUT)
 
@@ -133,7 +172,15 @@ HTTP yang diharapkan: `200 OK`; `data` berupa array yang memuat airline dengan
 curl.exe -i -X DELETE -H "Accept: application/json" "$baseUrl/api/flights/airlines/$airlineId"
 ```
 
-HTTP yang diharapkan: `200 OK`, dengan `data: null` dan `message: null`.
+HTTP yang diharapkan: `200 OK`, dengan pesan konfirmasi, misalnya:
+
+```json
+{
+  "status": 200,
+  "message": "Data dengan id <airlineId> berhasil dihapus.",
+  "data": null
+}
+```
 
 ## 9. Delete ulang untuk memastikan data sudah terhapus
 
@@ -152,3 +199,35 @@ curl.exe -i -H "Accept: application/json" "$baseUrl/api/flights/airlines/$airlin
 ```
 
 Detail setelah delete juga harus menghasilkan `404 Not Found`.
+
+## Body POST kosong, object kosong, atau JSON rusak
+
+Body tanpa isi ditolak dengan HTTP `400` karena body bukan JSON valid:
+
+```powershell
+curl.exe -i `
+    -X POST "$baseUrl/api/flights/airlines" `
+    -H "Accept: application/json" `
+    -H "Content-Type: application/json" `
+    --data-raw ''
+```
+
+Object JSON kosong ditolak dengan HTTP `400` karena field wajib tidak ada:
+
+```powershell
+curl.exe -i `
+    -X POST "$baseUrl/api/flights/airlines" `
+    -H "Accept: application/json" `
+    -H "Content-Type: application/json" `
+    --data-raw '{}'
+```
+
+JSON rusak juga ditolak dengan HTTP `400`:
+
+```powershell
+curl.exe -i `
+    -X POST "$baseUrl/api/flights/airlines" `
+    -H "Accept: application/json" `
+    -H "Content-Type: application/json" `
+    --data-raw '{'
+```

@@ -99,7 +99,7 @@ abstract class ResourceController extends BaseController
         $builder->orderBy($sort ?? $this->primaryKey, $order);
         $records = $builder->get()->getResultArray();
 
-        return $this->successResponse($records);
+        return $this->successResponse($records, 200, 'Data berhasil diambil.');
     }
 
     public function show(string $id): ResponseInterface
@@ -114,7 +114,7 @@ abstract class ResourceController extends BaseController
             return $this->errorResponse('Data tidak ditemukan.', 404);
         }
 
-        return $this->successResponse($record);
+        return $this->successResponse($record, 200, 'Data berhasil diambil.');
     }
 
     public function update(string $id): ResponseInterface
@@ -139,7 +139,7 @@ abstract class ResourceController extends BaseController
         $errors = $this->payloadErrors($payload, false, $id, $this->putRequiredFields);
 
         if ($errors !== []) {
-            return $this->errorResponse($this->validationMessage($errors), 422);
+            return $this->errorResponse($errors, 400);
         }
 
         $payload = array_merge(array_fill_keys($this->nullableFields, null), $payload);
@@ -149,7 +149,7 @@ abstract class ResourceController extends BaseController
             return $this->errorResponse('Gagal memperbarui data.', 500);
         }
 
-        return $this->successResponse($model->find($id));
+        return $this->successResponse($model->find($id), 200, 'Data berhasil diperbarui.');
     }
 
     public function patch(string $id): ResponseInterface
@@ -174,7 +174,7 @@ abstract class ResourceController extends BaseController
         $errors = $this->payloadErrors($payload, true, $id, [], $record);
 
         if ($errors !== []) {
-            return $this->errorResponse($this->validationMessage($errors), 422);
+            return $this->errorResponse($errors, 400);
         }
 
         $payload = $this->withUpdatedTimestamp($payload);
@@ -183,7 +183,7 @@ abstract class ResourceController extends BaseController
             return $this->errorResponse('Gagal memperbarui data.', 500);
         }
 
-        return $this->successResponse($model->find($id));
+        return $this->successResponse($model->find($id), 200, 'Data berhasil diperbarui.');
     }
 
     public function delete(string $id): ResponseInterface
@@ -213,7 +213,7 @@ abstract class ResourceController extends BaseController
             return $this->errorResponse('Gagal menghapus data.', 500);
         }
 
-        return $this->successResponse();
+        return $this->successResponse(null, 200, sprintf('Data dengan id %s berhasil dihapus.', $id));
     }
 
     protected function model(): Model
@@ -234,7 +234,7 @@ abstract class ResourceController extends BaseController
         $errors = $this->payloadErrors($payload);
 
         if ($errors !== []) {
-            return $this->errorResponse($this->validationMessage($errors), 422);
+            return $this->errorResponse($errors, 400);
         }
 
         $payload[$this->primaryKey] = $this->uuid();
@@ -250,7 +250,7 @@ abstract class ResourceController extends BaseController
             return $this->errorResponse('Data berhasil disimpan tetapi tidak dapat dibaca kembali.', 500);
         }
 
-        return $this->successResponse($record, 201);
+        return $this->successResponse($record, 201, 'Data berhasil ditambahkan.');
     }
 
     protected function jsonPayload(): array|ResponseInterface
@@ -271,32 +271,26 @@ abstract class ResourceController extends BaseController
     protected function successResponse(
         mixed $data = null,
         int $httpStatus = 200,
+        string $message = 'Data berhasil diproses.',
     ): ResponseInterface {
         return $this->respond([
-            'status' => 'success',
-            'data' => $data,
-            'message' => null,
-        ], $httpStatus);
-    }
-
-    protected function errorResponse(string $message, int $httpStatus): ResponseInterface
-    {
-        return $this->respond([
-            'status' => 'error',
-            'data' => null,
+            'status' => $httpStatus,
             'message' => $message,
+            'data' => $data,
         ], $httpStatus);
     }
 
-    protected function validationMessage(array $errors): string
+    protected function errorResponse(string|array $messages, int $httpStatus): ResponseInterface
     {
-        $messages = [];
-
-        foreach ($errors as $field => $message) {
-            $messages[] = sprintf('%s: %s', $field, $message);
+        if (is_string($messages)) {
+            $messages = ['_request' => $messages];
         }
 
-        return implode('; ', $messages);
+        return $this->respond([
+            'status' => $httpStatus,
+            'error' => $httpStatus,
+            'messages' => $messages,
+        ], $httpStatus);
     }
 
     protected function payloadErrors(

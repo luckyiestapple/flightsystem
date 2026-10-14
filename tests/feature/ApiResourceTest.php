@@ -17,10 +17,46 @@ final class ApiResourceTest extends CIUnitTestCase
 
         $result->assertStatus(400);
         $result->assertJSONFragment([
-            'status' => 'error',
-            'data' => null,
-            'message' => 'Body harus berupa JSON yang valid.',
+            'status' => 400,
+            'error' => 400,
+            'messages' => ['_request' => 'Body harus berupa JSON yang valid.'],
         ]);
+    }
+
+    public function testCreateRejectsEmptyBody(): void
+    {
+        $result = $this->withBody('')->post('/api/flights/airlines');
+
+        $result->assertStatus(400);
+        $result->assertJSONFragment([
+            'status' => 400,
+            'error' => 400,
+            'messages' => ['_request' => 'Body harus berupa JSON yang valid.'],
+        ]);
+    }
+
+    public function testCreateUsesNumericSuccessEnvelope(): void
+    {
+        $db = $this->attachAirlinesTable();
+
+        try {
+            $result = $this->withBody(json_encode([
+                'airline_code' => 'ZX123',
+                'airline_name' => 'Airline Uji',
+                'country' => 'Indonesia',
+                'status' => 'ACTIVE',
+            ], JSON_THROW_ON_ERROR))->post('/api/flights/airlines');
+
+            $result->assertStatus(201);
+            $body = json_decode($result->getJSON(), true, 512, JSON_THROW_ON_ERROR);
+
+            $this->assertSame(['status', 'message', 'data'], array_keys($body));
+            $this->assertSame(201, $body['status']);
+            $this->assertSame('Data berhasil ditambahkan.', $body['message']);
+            $this->assertSame('ZX123', $body['data']['airline_code']);
+        } finally {
+            $db->query('DETACH DATABASE airport_operations');
+        }
     }
 
     public function testDetailRejectsInvalidUuid(): void
@@ -29,9 +65,9 @@ final class ApiResourceTest extends CIUnitTestCase
 
         $result->assertStatus(404);
         $result->assertJSONFragment([
-            'status' => 'error',
-            'data' => null,
-            'message' => 'Data tidak ditemukan.',
+            'status' => 404,
+            'error' => 404,
+            'messages' => ['_request' => 'Data tidak ditemukan.'],
         ]);
     }
 
@@ -39,14 +75,14 @@ final class ApiResourceTest extends CIUnitTestCase
     {
         $result = $this->withBody('{}')->post('/api/flights/airlines');
 
-        $result->assertStatus(422);
+        $result->assertStatus(400);
         $body = json_decode($result->getJSON(), true, 512, JSON_THROW_ON_ERROR);
 
-        $this->assertSame('error', $body['status']);
-        $this->assertNull($body['data']);
-        $this->assertStringContainsString('airline_code:', $body['message']);
-        $this->assertStringContainsString('airline_name:', $body['message']);
-        $this->assertStringContainsString('country:', $body['message']);
+        $this->assertSame(400, $body['status']);
+        $this->assertSame(400, $body['error']);
+        $this->assertArrayHasKey('airline_code', $body['messages']);
+        $this->assertArrayHasKey('airline_name', $body['messages']);
+        $this->assertArrayHasKey('country', $body['messages']);
     }
 
     public function testCreateRejectsEmptyValues(): void
@@ -58,14 +94,14 @@ final class ApiResourceTest extends CIUnitTestCase
             'status' => null,
         ], JSON_THROW_ON_ERROR))->post('/api/flights/airlines');
 
-        $result->assertStatus(422);
+        $result->assertStatus(400);
         $body = json_decode($result->getJSON(), true, 512, JSON_THROW_ON_ERROR);
 
-        $this->assertSame('error', $body['status']);
-        $this->assertNull($body['data']);
-        $this->assertStringContainsString('airline_code: Field tidak boleh kosong.', $body['message']);
-        $this->assertStringContainsString('airline_name: Field tidak boleh kosong.', $body['message']);
-        $this->assertStringContainsString('status: Field tidak boleh null.', $body['message']);
+        $this->assertSame(400, $body['status']);
+        $this->assertSame(400, $body['error']);
+        $this->assertSame('Field tidak boleh kosong.', $body['messages']['airline_code']);
+        $this->assertSame('Field tidak boleh kosong.', $body['messages']['airline_name']);
+        $this->assertSame('Field tidak boleh null.', $body['messages']['status']);
     }
 
     public function testCreateRejectsDuplicateAirlineCodeWithoutDatabaseConnectionError(): void
@@ -83,12 +119,15 @@ final class ApiResourceTest extends CIUnitTestCase
                 'country' => 'Indonesia',
             ], JSON_THROW_ON_ERROR))->post('/api/flights/airlines');
 
-            $result->assertStatus(422);
+            $result->assertStatus(400);
             $result->assertJSONFragment([
-                'status' => 'error',
-                'data' => null,
+                'status' => 400,
+                'error' => 400,
             ]);
-            $this->assertStringContainsString('airline_code: Nilai field harus unik.', $result->getJSON());
+            $this->assertSame(
+                'Nilai field harus unik.',
+                json_decode($result->getJSON(), true, 512, JSON_THROW_ON_ERROR)['messages']['airline_code'],
+            );
         } finally {
             $db->query('DETACH DATABASE airport_operations');
         }
@@ -107,12 +146,15 @@ final class ApiResourceTest extends CIUnitTestCase
                 'destination_airport_id' => '01a423ce-cc53-4c18-a522-4de8ba31b2d5',
             ], JSON_THROW_ON_ERROR))->post('/api/flights/routes');
 
-            $result->assertStatus(422);
+            $result->assertStatus(400);
             $result->assertJSONFragment([
-                'status' => 'error',
-                'data' => null,
+                'status' => 400,
+                'error' => 400,
             ]);
-            $this->assertStringContainsString('origin_airport_id: Data referensi tidak ditemukan.', $result->getJSON());
+            $this->assertSame(
+                'Data referensi tidak ditemukan.',
+                json_decode($result->getJSON(), true, 512, JSON_THROW_ON_ERROR)['messages']['origin_airport_id'],
+            );
         } finally {
             $db->query('DETACH DATABASE airport_operations');
         }
@@ -124,9 +166,9 @@ final class ApiResourceTest extends CIUnitTestCase
 
         $result->assertStatus(404);
         $result->assertJSONFragment([
-            'status' => 'error',
-            'data' => null,
-            'message' => 'Data tidak ditemukan.',
+            'status' => 404,
+            'error' => 404,
+            'messages' => ['_request' => 'Data tidak ditemukan.'],
         ]);
     }
 
@@ -139,9 +181,9 @@ final class ApiResourceTest extends CIUnitTestCase
 
             $result->assertStatus(404);
             $result->assertJSONFragment([
-                'status' => 'error',
-                'data' => null,
-                'message' => 'Data tidak ditemukan.',
+                'status' => 404,
+                'error' => 404,
+                'messages' => ['_request' => 'Data tidak ditemukan.'],
             ]);
         } finally {
             $db->query('DETACH DATABASE airport_operations');
@@ -156,7 +198,6 @@ final class ApiResourceTest extends CIUnitTestCase
             'airline_id' => $airlineId,
             'airline_code' => 'GA',
         ]);
-
         try {
             $result = $this->withBody(json_encode([
                 'airline_code' => '',
@@ -165,12 +206,45 @@ final class ApiResourceTest extends CIUnitTestCase
                 'status' => 'ACTIVE',
             ], JSON_THROW_ON_ERROR))->put('/api/flights/airlines/' . $airlineId);
 
-            $result->assertStatus(422);
+            $result->assertStatus(400);
             $result->assertJSONFragment([
-                'status' => 'error',
-                'data' => null,
+                'status' => 400,
+                'error' => 400,
             ]);
-            $this->assertStringContainsString('airline_code: Field tidak boleh kosong.', $result->getJSON());
+            $this->assertSame(
+                'Field tidak boleh kosong.',
+                json_decode($result->getJSON(), true, 512, JSON_THROW_ON_ERROR)['messages']['airline_code'],
+            );
+        } finally {
+            $db->query('DETACH DATABASE airport_operations');
+        }
+    }
+
+    public function testUpdateUsesNumericSuccessEnvelope(): void
+    {
+        $db = $this->attachAirlinesTable();
+        $airlineId = '850a46d0-79c0-4db4-9241-51bdaea8f57d';
+        $db->table('airport_operations.airlines')->insert([
+            'airline_id' => $airlineId,
+            'airline_code' => 'GA',
+            'airline_name' => 'Garuda Indonesia',
+            'country' => 'Indonesia',
+            'status' => 'ACTIVE',
+        ]);
+
+        try {
+            $result = $this->withBody(json_encode([
+                'airline_code' => 'GA',
+                'airline_name' => 'Garuda Indonesia Baru',
+                'country' => 'Indonesia',
+                'status' => 'ACTIVE',
+            ], JSON_THROW_ON_ERROR))->put('/api/flights/airlines/' . $airlineId);
+
+            $result->assertStatus(200);
+            $body = json_decode($result->getJSON(), true, 512, JSON_THROW_ON_ERROR);
+            $this->assertSame(200, $body['status']);
+            $this->assertSame('Data berhasil diperbarui.', $body['message']);
+            $this->assertSame('Garuda Indonesia Baru', $body['data']['airline_name']);
         } finally {
             $db->query('DETACH DATABASE airport_operations');
         }
@@ -191,12 +265,15 @@ final class ApiResourceTest extends CIUnitTestCase
                 'airline_name' => ' ',
             ], JSON_THROW_ON_ERROR))->call('PATCH', '/api/flights/airlines/' . $airlineId);
 
-            $result->assertStatus(422);
+            $result->assertStatus(400);
             $result->assertJSONFragment([
-                'status' => 'error',
-                'data' => null,
+                'status' => 400,
+                'error' => 400,
             ]);
-            $this->assertStringContainsString('airline_name: Field tidak boleh kosong.', $result->getJSON());
+            $this->assertSame(
+                'Field tidak boleh kosong.',
+                json_decode($result->getJSON(), true, 512, JSON_THROW_ON_ERROR)['messages']['airline_name'],
+            );
         } finally {
             $db->query('DETACH DATABASE airport_operations');
         }
@@ -219,11 +296,37 @@ final class ApiResourceTest extends CIUnitTestCase
             $result->assertStatus(200);
             $body = json_decode($result->getJSON(), true, 512, JSON_THROW_ON_ERROR);
 
-            $this->assertSame(['status', 'data', 'message'], array_keys($body));
-            $this->assertSame('success', $body['status']);
-            $this->assertNull($body['message']);
+            $this->assertSame(['status', 'message', 'data'], array_keys($body));
+            $this->assertSame(200, $body['status']);
+            $this->assertSame('Data berhasil diambil.', $body['message']);
             $this->assertCount(3, $body['data']);
             $this->assertArrayNotHasKey('meta', $body);
+        } finally {
+            $db->query('DETACH DATABASE airport_operations');
+        }
+    }
+
+    public function testDeleteUsesNumericSuccessEnvelopeAndConfirmsDeletedId(): void
+    {
+        $db = $this->attachAirlinesTable();
+        $airlineId = '850a46d0-79c0-4db4-9241-51bdaea8f57d';
+        $db->table('airport_operations.airlines')->insert([
+            'airline_id' => $airlineId,
+            'airline_code' => 'GA',
+        ]);
+        $db->query(
+            'CREATE TABLE airport_operations.db_flights (airline_id TEXT)',
+        );
+
+        try {
+            $result = $this->delete('/api/flights/airlines/' . $airlineId);
+
+            $result->assertStatus(200);
+            $body = json_decode($result->getJSON(), true, 512, JSON_THROW_ON_ERROR);
+            $this->assertSame(200, $body['status']);
+            $this->assertSame('Data dengan id ' . $airlineId . ' berhasil dihapus.', $body['message']);
+            $this->assertNull($body['data']);
+            $this->assertSame(0, $db->table('airport_operations.airlines')->countAllResults());
         } finally {
             $db->query('DETACH DATABASE airport_operations');
         }
@@ -244,7 +347,9 @@ final class ApiResourceTest extends CIUnitTestCase
         $db->query("ATTACH DATABASE ':memory:' AS airport_operations");
         $db->query(
             'CREATE TABLE airport_operations.db_airlines ('
-            . 'airline_id TEXT PRIMARY KEY, airline_code TEXT NOT NULL)',
+            . 'airline_id TEXT PRIMARY KEY, airline_code TEXT NOT NULL, '
+            . 'airline_name TEXT NOT NULL DEFAULT \'\', country TEXT NOT NULL DEFAULT \'\', '
+            . 'contact TEXT, status TEXT NOT NULL DEFAULT \'ACTIVE\')',
         );
 
         return $db;

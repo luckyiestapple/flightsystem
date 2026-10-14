@@ -71,42 +71,42 @@ dengan endpoint `/api/flights/search/{resource}`.
 
 ## Bentuk respons
 
-Semua respons sukses maupun gagal menggunakan tiga key yang sama:
-`status`, `data`, dan `message`. Respons sukses memakai `status: "success"`
-dan `message: null`; respons gagal memakai `status: "error"`, `data: null`,
-dan `message` berisi keterangan error.
+Respons sukses menggunakan `status`, `message`, dan `data`. Nilai `status`
+adalah kode HTTP numerik, `message` berisi keterangan hasil, dan `data` memuat
+record atau array record.
 
 ```json
 {
-  "status": "success",
+  "status": 200,
+  "message": "Data berhasil diambil.",
   "data": {
     "flight_id": "uuid-flight-001",
     "flight_number": "GA204",
     "flight_status": "SCHEDULED"
-  },
-  "message": null
+  }
 }
 ```
 
 Pada collection/search, `data` berupa array record (termasuk array kosong jika
 tidak ditemukan). Pada detail/create/update, `data` berupa object record.
-Delete sukses mengembalikan `data: null`. Create mengembalikan HTTP `201`;
-operasi sukses lainnya mengembalikan HTTP `200`.
+Delete sukses mengembalikan `data: null` dan pesan konfirmasi. Create
+mengembalikan HTTP dan `status` `201`; operasi sukses lainnya menggunakan `200`.
 
-Kesalahan validasi berstatus `422`; rincian kesalahan field disertakan dalam
-string `message`. JSON tidak valid atau parameter query tidak valid
-mengembalikan `400`; record tidak ditemukan mengembalikan `404`; penghapusan
-record yang masih direferensikan mengembalikan `409`. Jika record yang akan
-dihapus sudah tidak ada, DELETE juga mengembalikan `404` dengan pesan
-`Data tidak ditemukan.`.
+Respons error menggunakan `status`, `error`, dan `messages`. `status` dan
+`error` berisi kode HTTP numerik yang sama. Detail validasi ada di `messages`
+dengan nama field sebagai key. Payload invalid, JSON kosong/rusak, dan parameter
+query invalid mengembalikan `400`; record tidak ditemukan mengembalikan `404`;
+penghapusan record yang masih direferensikan mengembalikan `409`.
 
 Contoh kesalahan:
 
 ```json
 {
-  "status": "error",
-  "data": null,
-  "message": "airline_code: The airline_code field is required."
+  "status": 400,
+  "error": 400,
+  "messages": {
+    "airline_code": "Nilai field harus unik."
+  }
 }
 ```
 
@@ -114,7 +114,7 @@ Contoh kesalahan:
 
 Field ID dibuat oleh API dan tidak boleh dikirim saat create/update. Field
 timestamp dikelola database/API, bukan payload klien. Field yang tidak tercantum
-sebagai writable akan ditolak dengan `422`.
+sebagai writable akan ditolak dengan `400`.
 
 ### Airlines
 
@@ -247,7 +247,7 @@ nullable yang tidak dikirim akan dikosongkan (`null`); field nullable yang
 disertakan juga boleh diberi nilai `null`. Field status harus selalu dikirim
 untuk airline, airport, dan flight. Object kosong, field wajib yang hilang,
 `null` pada field wajib, dan string kosong (termasuk string yang hanya berisi
-spasi) ditolak dengan HTTP `422`. Untuk mengosongkan field nullable kirim
+spasi) ditolak dengan HTTP `400`. Untuk mengosongkan field nullable kirim
 `null`, bukan string kosong. Field non-nullable yang dikirim dengan `null` juga
 ditolak.
 
@@ -269,7 +269,7 @@ PUT /api/flights/airlines/{airline_id}
 PATCH hanya mengubah field yang dikirim. Field lain tetap seperti semula.
 Kirim setidaknya satu field. Untuk menghapus nilai field nullable, kirim
 `null` secara eksplisit. Object kosong, nilai string kosong, dan nilai yang
-hanya berisi spasi ditolak dengan HTTP `422`. `null` ditolak untuk field
+hanya berisi spasi ditolak dengan HTTP `400`. `null` ditolak untuk field
 non-nullable.
 
 ```http
@@ -295,9 +295,9 @@ mengembalikan:
 
 ```json
 {
-  "status": "success",
-  "data": null,
-  "message": null
+  "status": 200,
+  "message": "Data dengan id 4 berhasil dihapus.",
+  "data": null
 }
 ```
 
