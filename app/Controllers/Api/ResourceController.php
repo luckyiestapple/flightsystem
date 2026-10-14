@@ -41,6 +41,21 @@ abstract class ResourceController extends BaseController
         ]);
     }
 
+    public function show(string $id): ResponseInterface
+    {
+        if (! $this->isUuid($id)) {
+            return $this->respond(['message' => 'Data tidak ditemukan.'], 404);
+        }
+
+        $record = $this->model()->find($id);
+
+        if ($record === null) {
+            return $this->respond(['message' => 'Data tidak ditemukan.'], 404);
+        }
+
+        return $this->respond(['data' => $record]);
+    }
+
     protected function model(): Model
     {
         $modelClass = $this->modelClass;
@@ -161,5 +176,10 @@ abstract class ResourceController extends BaseController
         $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80);
 
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
+    }
+
+    protected function isUuid(string $value): bool
+    {
+        return preg_match('/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/', $value) === 1;
     }
 }
