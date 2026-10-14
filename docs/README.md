@@ -2,7 +2,7 @@
 
 Dokumentasi ini menjelaskan API CRUD JSON untuk seluruh tabel pada migration
 `CreateAirportOperations`: `airlines`, `airports`, `routes`, dan `flights`.
-Semua endpoint menggunakan prefix `/api/v1`.
+Semua endpoint menggunakan prefix `/api/flights`.
 
 ## Persiapan
 
@@ -32,16 +32,16 @@ sebelum mengekspos endpoint ke jaringan publik.
 
 | Method | Endpoint | Kegunaan |
 | --- | --- | --- |
-| `POST` | `/api/v1/{resource}` | Membuat record |
-| `GET` | `/api/v1/{resource}` | Mengambil daftar dengan pagination |
-| `GET` | `/api/v1/{resource}/search` | Mencari, memfilter, dan mengurutkan data |
-| `GET` | `/api/v1/{resource}/{id}` | Mengambil detail satu record |
-| `PUT` | `/api/v1/{resource}/{id}` | Mengganti data record |
-| `PATCH` | `/api/v1/{resource}/{id}` | Mengubah sebagian field |
-| `DELETE` | `/api/v1/{resource}/{id}` | Menghapus record |
+| `POST` | `/api/flights/{resource}` | Membuat record |
+| `GET` | `/api/flights/{resource}` | Mengambil daftar dengan pagination |
+| `GET` | `/api/flights/search/{resource}` | Mencari, memfilter, dan mengurutkan data |
+| `GET` | `/api/flights/{resource}/{id}` | Mengambil detail satu record |
+| `PUT` | `/api/flights/{resource}/{id}` | Mengganti data record |
+| `PATCH` | `/api/flights/{resource}/{id}` | Mengubah sebagian field |
+| `DELETE` | `/api/flights/{resource}/{id}` | Menghapus record |
 
 Collection `GET` juga menerima query pencarian, filter, dan sorting yang sama
-dengan endpoint `/search`.
+dengan endpoint `/api/flights/search/{resource}`.
 
 ## Bentuk respons
 
@@ -67,7 +67,8 @@ Kesalahan menggunakan JSON. Kesalahan validasi berstatus `422` dan memiliki
 object `errors` yang dipetakan berdasarkan nama field. JSON tidak valid atau
 parameter query tidak valid mengembalikan `400`; record tidak ditemukan
 mengembalikan `404`; penghapusan record yang masih direferensikan mengembalikan
-`409`.
+`409`. Jika record yang akan dihapus sudah tidak ada, DELETE juga mengembalikan
+`404` dengan pesan `Data tidak ditemukan.`.
 
 Contoh kesalahan:
 
@@ -95,14 +96,14 @@ Tabel `airport_operations.airlines`.
 | `airline_code` | string, maks. 10, unik | wajib | Alfanumerik |
 | `airline_name` | string, maks. 150 | wajib | Nama maskapai |
 | `country` | string, maks. 100 | wajib | Negara |
-| `contact` | string/null, maks. 100 | opsional | Boleh `null` |
+| `contact` | string/null, maks. 100 | opsional | Boleh `null`, string kosong ditolak |
 | `status` | `ACTIVE` atau `INACTIVE` | opsional | Default `ACTIVE` |
 | `created_at` | timestamp | otomatis | Dibuat database |
 
 Contoh:
 
 ```http
-POST /api/v1/airlines
+POST /api/flights/airlines
 ```
 
 ```json
@@ -195,7 +196,7 @@ Contoh:
 ## Membaca dan pagination
 
 ```http
-GET /api/v1/flights?page=2&per_page=25
+GET /api/flights/flights?page=2&per_page=25
 ```
 
 - `page`: bilangan bulat mulai dari `1`, default `1`.
@@ -205,7 +206,7 @@ GET /api/v1/flights?page=2&per_page=25
 Detail:
 
 ```http
-GET /api/v1/flights/c974888f-ec55-46a8-885e-2d790a1868b6
+GET /api/flights/flights/c974888f-ec55-46a8-885e-2d790a1868b6
 ```
 
 ## Edit data
@@ -215,10 +216,14 @@ GET /api/v1/flights/c974888f-ec55-46a8-885e-2d790a1868b6
 PUT menerima field non-nullable yang wajib untuk resource tersebut. Field
 nullable yang tidak dikirim akan dikosongkan (`null`); field nullable yang
 disertakan juga boleh diberi nilai `null`. Field status harus selalu dikirim
-untuk airline, airport, dan flight.
+untuk airline, airport, dan flight. Object kosong, field wajib yang hilang,
+`null` pada field wajib, dan string kosong (termasuk string yang hanya berisi
+spasi) ditolak dengan HTTP `422`. Untuk mengosongkan field nullable kirim
+`null`, bukan string kosong. Field non-nullable yang dikirim dengan `null` juga
+ditolak.
 
 ```http
-PUT /api/v1/airlines/{airline_id}
+PUT /api/flights/airlines/{airline_id}
 ```
 
 ```json
@@ -234,10 +239,12 @@ PUT /api/v1/airlines/{airline_id}
 
 PATCH hanya mengubah field yang dikirim. Field lain tetap seperti semula.
 Kirim setidaknya satu field. Untuk menghapus nilai field nullable, kirim
-`null` secara eksplisit.
+`null` secara eksplisit. Object kosong, nilai string kosong, dan nilai yang
+hanya berisi spasi ditolak dengan HTTP `422`. `null` ditolak untuk field
+non-nullable.
 
 ```http
-PATCH /api/v1/airlines/{airline_id}
+PATCH /api/flights/airlines/{airline_id}
 ```
 
 ```json
@@ -249,7 +256,7 @@ PATCH /api/v1/airlines/{airline_id}
 ## Hapus data
 
 ```http
-DELETE /api/v1/airlines/{airline_id}
+DELETE /api/flights/airlines/{airline_id}
 ```
 
 Airport yang dipakai route, airline yang dipakai flight, dan route yang dipakai
@@ -267,10 +274,10 @@ mengembalikan:
 
 Pencarian teks dilakukan case-insensitive pada kolom teks yang didukung. Filter
 bersifat exact-match; beberapa filter sekaligus digabungkan dengan kondisi AND.
-Gunakan `/search` atau collection endpoint.
+Gunakan `/api/flights/search/{resource}` atau collection endpoint.
 
 ```http
-GET /api/v1/airports/search?q=jakarta&filter[status]=ACTIVE&sort=airport_name&order=ASC
+GET /api/flights/search/airports?q=jakarta&filter[status]=ACTIVE&sort=airport_name&order=ASC
 ```
 
 Untuk URL yang mengharuskan encoding bracket, gunakan
@@ -288,7 +295,7 @@ Kolom `q` dan filter per resource:
 Contoh mencari flight maskapai tertentu:
 
 ```http
-GET /api/v1/flights/search?filter[airline_id]=4d206f9c-257d-4db2-a5ca-67a337a7cc1b&filter[flight_status]=SCHEDULED
+GET /api/flights/search/flights?filter[airline_id]=4d206f9c-257d-4db2-a5ca-67a337a7cc1b&filter[flight_status]=SCHEDULED
 ```
 
 Sorting menggunakan `sort` dan `order` (`ASC` atau `DESC`). Hanya kolom berikut
