@@ -19,5 +19,6 @@ class AirportModel extends Model
         'country',
         'timezone',
         'status',
+        'updated_at',
     ];
 }

@@ -26,5 +26,6 @@ class FlightModel extends Model
         'estimated_arrival',
         'actual_arrival',
         'flight_status',
+        'updated_at',
     ];
 }
