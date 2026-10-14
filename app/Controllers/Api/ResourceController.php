@@ -284,12 +284,13 @@ abstract class ResourceController extends BaseController
         }
 
         $payload[$this->primaryKey] = $this->uuid();
+        $model = $this->model();
 
-        if (! $this->model()->insert($payload)) {
-            return $this->respond(['errors' => $this->model()->errors()], 422);
+        if (! $model->insert($payload, false)) {
+            return $this->respond(['errors' => $model->errors()], 422);
         }
 
-        $record = $this->model()->find($payload[$this->primaryKey]);
+        $record = $model->find($payload[$this->primaryKey]);
 
         if ($record === null) {
             return $this->respond(['message' => 'Data berhasil disimpan tetapi tidak dapat dibaca kembali.'], 500);
