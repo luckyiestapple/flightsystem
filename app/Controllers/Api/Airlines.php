@@ -10,6 +10,8 @@ final class Airlines extends ResourceController
     protected string $primaryKey = 'airline_id';
     protected array $writableFields = ['airline_code', 'airline_name', 'country', 'contact', 'status'];
     protected array $requiredFields = ['airline_code', 'airline_name', 'country'];
+    protected array $putRequiredFields = ['airline_code', 'airline_name', 'country', 'status'];
+    protected array $nullableFields = ['contact'];
     protected array $validationRules = [
         'airline_code' => 'max_length[10]|alpha_numeric|is_unique[airport_operations.airlines.airline_code]',
         'airline_name' => 'max_length[150]',

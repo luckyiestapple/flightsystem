@@ -13,6 +13,8 @@ abstract class ResourceController extends BaseController
     protected string $primaryKey;
     protected array $writableFields = [];
     protected array $requiredFields = [];
+    protected array $putRequiredFields = [];
+    protected array $nullableFields = [];
     protected array $validationRules = [];
     protected array $references = [];
 
@@ -76,7 +78,45 @@ abstract class ResourceController extends BaseController
             return $payload;
         }
 
-        $errors = $this->payloadErrors($payload, false, $id);
+        $errors = $this->payloadErrors($payload, false, $id, $this->putRequiredFields);
+
+        if ($errors !== []) {
+            return $this->respond(['errors' => $errors], 422);
+        }
+
+        $payload = array_merge(array_fill_keys($this->nullableFields, null), $payload);
+        $payload = $this->withUpdatedTimestamp($payload);
+
+        if (! $model->update($id, $payload)) {
+            return $this->respond(['message' => 'Gagal memperbarui data.'], 500);
+        }
+
+        return $this->respond([
+            'data' => $model->find($id),
+            'message' => 'Data berhasil diperbarui.',
+        ]);
+    }
+
+    public function patch(string $id): ResponseInterface
+    {
+        if (! $this->isUuid($id)) {
+            return $this->respond(['message' => 'Data tidak ditemukan.'], 404);
+        }
+
+        $model = $this->model();
+        $record = $model->find($id);
+
+        if ($record === null) {
+            return $this->respond(['message' => 'Data tidak ditemukan.'], 404);
+        }
+
+        $payload = $this->jsonPayload();
+
+        if ($payload instanceof ResponseInterface) {
+            return $payload;
+        }
+
+        $errors = $this->payloadErrors($payload, true, $id, [], $record);
 
         if ($errors !== []) {
             return $this->respond(['errors' => $errors], 422);
@@ -90,7 +130,7 @@ abstract class ResourceController extends BaseController
 
         return $this->respond([
             'data' => $model->find($id),
-            'message' => 'Data berhasil diperbarui.',
+            'message' => 'Data berhasil diperbarui sebagian.',
         ]);
     }
 
@@ -199,10 +239,17 @@ abstract class ResourceController extends BaseController
         return (array) $payload;
     }
 
-    protected function payloadErrors(array $payload, bool $partial = false, ?string $id = null): array
+    protected function payloadErrors(
+        array $payload,
+        bool $partial = false,
+        ?string $id = null,
+        ?array $requiredFields = null,
+        ?array $existing = null,
+    ): array
     {
         $errors = [];
         $unknownFields = array_diff(array_keys($payload), $this->writableFields);
+        $requiredFields ??= $this->requiredFields;
 
         foreach ($unknownFields as $field) {
             $errors[$field] = 'Field tidak dikenal atau tidak dapat diubah.';
@@ -219,12 +266,17 @@ abstract class ResourceController extends BaseController
                 continue;
             }
 
-            if (! $partial && in_array($field, $this->requiredFields, true)) {
-                $rule = 'required|' . $this->validationRules[$field];
-            } elseif (isset($this->validationRules[$field])) {
+            $required = in_array($field, $requiredFields, true);
+            $provided = array_key_exists($field, $payload);
+
+            if (! $provided && ! $required) {
+                continue;
+            }
+
+            if (in_array($field, $this->nullableFields, true)) {
                 $rule = 'permit_empty|' . $this->validationRules[$field];
             } else {
-                continue;
+                $rule = 'required|' . $this->validationRules[$field];
             }
 
             if ($id !== null) {
@@ -247,7 +299,7 @@ abstract class ResourceController extends BaseController
             $errors = array_merge($errors, $this->validator->getErrors());
         }
 
-        return array_merge($errors, $this->recordErrors($payload));
+        return array_merge($errors, $this->recordErrors(array_merge($existing ?? [], $payload)));
     }
 
     protected function recordErrors(array $payload): array

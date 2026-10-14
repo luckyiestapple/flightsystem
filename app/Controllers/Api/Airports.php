@@ -10,6 +10,14 @@ final class Airports extends ResourceController
     protected string $primaryKey = 'airport_id';
     protected array $writableFields = ['airport_code', 'airport_name', 'city', 'country', 'timezone', 'status'];
     protected array $requiredFields = ['airport_code', 'airport_name', 'city', 'country', 'timezone'];
+    protected array $putRequiredFields = [
+        'airport_code',
+        'airport_name',
+        'city',
+        'country',
+        'timezone',
+        'status',
+    ];
     protected array $validationRules = [
         'airport_code' => 'max_length[10]|alpha_numeric|is_unique[airport_operations.airports.airport_code]',
         'airport_name' => 'max_length[150]',

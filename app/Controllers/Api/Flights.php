@@ -30,6 +30,23 @@ final class Flights extends ResourceController
         'scheduled_departure',
         'scheduled_arrival',
     ];
+    protected array $putRequiredFields = [
+        'flight_number',
+        'airline_id',
+        'route_id',
+        'scheduled_departure',
+        'scheduled_arrival',
+        'flight_status',
+    ];
+    protected array $nullableFields = [
+        'aircraft_id',
+        'departure_gate_id',
+        'arrival_gate_id',
+        'estimated_departure',
+        'actual_departure',
+        'estimated_arrival',
+        'actual_arrival',
+    ];
     protected array $validationRules = [
         'flight_number' => 'max_length[20]',
         'airline_id' => 'is_not_unique[airport_operations.airlines.airline_id]',
