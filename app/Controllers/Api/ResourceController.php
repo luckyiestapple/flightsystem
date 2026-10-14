@@ -37,23 +37,16 @@ abstract class ResourceController extends BaseController
 
     protected function listing(): ResponseInterface
     {
-        $pagination = $this->pagination();
-
-        if ($pagination instanceof ResponseInterface) {
-            return $pagination;
-        }
-
-        [$page, $perPage] = $pagination;
         $builder = $this->model()->builder();
         $query = $this->request->getGet('q');
 
         if ($query !== null) {
             if (! is_string($query)) {
-                return $this->respond(['message' => 'Parameter q harus berupa teks.'], 400);
+                return $this->errorResponse('Parameter q harus berupa teks.', 400);
             }
 
             if ($query !== '' && $this->searchableFields === []) {
-                return $this->respond(['message' => 'Pencarian teks tidak tersedia untuk resource ini.'], 400);
+                return $this->errorResponse('Pencarian teks tidak tersedia untuk resource ini.', 400);
             }
 
             if ($query !== '') {
@@ -74,20 +67,16 @@ abstract class ResourceController extends BaseController
         $filters = $this->request->getGet('filter') ?? [];
 
         if (! is_array($filters)) {
-            return $this->respond(['message' => 'Parameter filter harus berupa object field=nilai.'], 400);
+            return $this->errorResponse('Parameter filter harus berupa object field=nilai.', 400);
         }
 
         foreach ($filters as $field => $value) {
             if (! in_array($field, $this->filterableFields, true)) {
-                return $this->respond([
-                    'message' => sprintf('Field filter "%s" tidak didukung.', $field),
-                ], 400);
+                return $this->errorResponse(sprintf('Field filter "%s" tidak didukung.', $field), 400);
             }
 
             if (! is_string($value) && ! is_numeric($value)) {
-                return $this->respond([
-                    'message' => sprintf('Nilai filter "%s" harus berupa scalar.', $field),
-                ], 400);
+                return $this->errorResponse(sprintf('Nilai filter "%s" harus berupa scalar.', $field), 400);
             }
 
             $builder->where($field, $value);
@@ -97,57 +86,46 @@ abstract class ResourceController extends BaseController
         $order = $this->request->getGet('order') ?? 'ASC';
 
         if ($sort !== null && (! is_string($sort) || ! in_array($sort, $this->sortableFields, true))) {
-            return $this->respond(['message' => 'Field sort tidak didukung.'], 400);
+            return $this->errorResponse('Field sort tidak didukung.', 400);
         }
 
         if (! is_string($order) || ! in_array(strtoupper($order), ['ASC', 'DESC'], true)) {
-            return $this->respond(['message' => 'Parameter order hanya boleh ASC atau DESC.'], 400);
+            return $this->errorResponse('Parameter order hanya boleh ASC atau DESC.', 400);
         }
 
         $order = strtoupper($order);
         $builder->orderBy($sort ?? $this->primaryKey, $order);
-        $total = $builder->countAllResults(false);
-        $records = $builder
-            ->get($perPage, ($page - 1) * $perPage)
-            ->getResultArray();
+        $records = $builder->get()->getResultArray();
 
-        return $this->respond([
-            'data' => $records,
-            'meta' => [
-                'page' => $page,
-                'per_page' => $perPage,
-                'total' => $total,
-                'total_pages' => (int) ceil($total / $perPage),
-            ],
-        ]);
+        return $this->successResponse($records);
     }
 
     public function show(string $id): ResponseInterface
     {
         if (! $this->isUuid($id)) {
-            return $this->respond(['message' => 'Data tidak ditemukan.'], 404);
+            return $this->errorResponse('Data tidak ditemukan.', 404);
         }
 
         $record = $this->model()->find($id);
 
         if ($record === null) {
-            return $this->respond(['message' => 'Data tidak ditemukan.'], 404);
+            return $this->errorResponse('Data tidak ditemukan.', 404);
         }
 
-        return $this->respond(['data' => $record]);
+        return $this->successResponse($record);
     }
 
     public function update(string $id): ResponseInterface
     {
         if (! $this->isUuid($id)) {
-            return $this->respond(['message' => 'Data tidak ditemukan.'], 404);
+            return $this->errorResponse('Data tidak ditemukan.', 404);
         }
 
         $model = $this->model();
         $record = $model->find($id);
 
         if ($record === null) {
-            return $this->respond(['message' => 'Data tidak ditemukan.'], 404);
+            return $this->errorResponse('Data tidak ditemukan.', 404);
         }
 
         $payload = $this->jsonPayload();
@@ -159,33 +137,30 @@ abstract class ResourceController extends BaseController
         $errors = $this->payloadErrors($payload, false, $id, $this->putRequiredFields);
 
         if ($errors !== []) {
-            return $this->respond(['errors' => $errors], 422);
+            return $this->errorResponse($this->validationMessage($errors), 422);
         }
 
         $payload = array_merge(array_fill_keys($this->nullableFields, null), $payload);
         $payload = $this->withUpdatedTimestamp($payload);
 
         if (! $model->update($id, $payload)) {
-            return $this->respond(['message' => 'Gagal memperbarui data.'], 500);
+            return $this->errorResponse('Gagal memperbarui data.', 500);
         }
 
-        return $this->respond([
-            'data' => $model->find($id),
-            'message' => 'Data berhasil diperbarui.',
-        ]);
+        return $this->successResponse($model->find($id));
     }
 
     public function patch(string $id): ResponseInterface
     {
         if (! $this->isUuid($id)) {
-            return $this->respond(['message' => 'Data tidak ditemukan.'], 404);
+            return $this->errorResponse('Data tidak ditemukan.', 404);
         }
 
         $model = $this->model();
         $record = $model->find($id);
 
         if ($record === null) {
-            return $this->respond(['message' => 'Data tidak ditemukan.'], 404);
+            return $this->errorResponse('Data tidak ditemukan.', 404);
         }
 
         $payload = $this->jsonPayload();
@@ -197,50 +172,46 @@ abstract class ResourceController extends BaseController
         $errors = $this->payloadErrors($payload, true, $id, [], $record);
 
         if ($errors !== []) {
-            return $this->respond(['errors' => $errors], 422);
+            return $this->errorResponse($this->validationMessage($errors), 422);
         }
 
         $payload = $this->withUpdatedTimestamp($payload);
 
         if (! $model->update($id, $payload)) {
-            return $this->respond(['message' => 'Gagal memperbarui data.'], 500);
+            return $this->errorResponse('Gagal memperbarui data.', 500);
         }
 
-        return $this->respond([
-            'data' => $model->find($id),
-            'message' => 'Data berhasil diperbarui sebagian.',
-        ]);
+        return $this->successResponse($model->find($id));
     }
 
     public function delete(string $id): ResponseInterface
     {
         if (! $this->isUuid($id)) {
-            return $this->respond(['message' => 'Data tidak ditemukan.'], 404);
+            return $this->errorResponse('Data tidak ditemukan.', 404);
         }
 
         $model = $this->model();
 
         if ($model->find($id) === null) {
-            return $this->respond(['message' => 'Data tidak ditemukan.'], 404);
+            return $this->errorResponse('Data tidak ditemukan.', 404);
         }
 
         foreach ($this->references as $table => $fields) {
             foreach ($fields as $field) {
                 if (db_connect()->table($table)->where($field, $id)->countAllResults() > 0) {
-                    return $this->respond([
-                        'message' => 'Data tidak dapat dihapus karena masih digunakan oleh data lain.',
-                    ], 409);
+                    return $this->errorResponse(
+                        'Data tidak dapat dihapus karena masih digunakan oleh data lain.',
+                        409,
+                    );
                 }
             }
         }
 
         if (! $model->delete($id)) {
-            return $this->respond(['message' => 'Gagal menghapus data.'], 500);
+            return $this->errorResponse('Gagal menghapus data.', 500);
         }
 
-        return $this->respond([
-            'message' => 'Data berhasil dihapus.',
-        ]);
+        return $this->successResponse();
     }
 
     protected function model(): Model
@@ -248,26 +219,6 @@ abstract class ResourceController extends BaseController
         $modelClass = $this->modelClass;
 
         return new $modelClass();
-    }
-
-    protected function pagination(): array|ResponseInterface
-    {
-        $page = $this->request->getGet('page') ?? 1;
-        $perPage = $this->request->getGet('per_page') ?? 20;
-
-        if (
-            filter_var($page, FILTER_VALIDATE_INT) === false
-            || filter_var($perPage, FILTER_VALIDATE_INT) === false
-            || (int) $page < 1
-            || (int) $perPage < 1
-            || (int) $perPage > 100
-        ) {
-            return $this->respond([
-                'message' => 'Parameter page harus >= 1 dan per_page harus berada di antara 1 sampai 100.',
-            ], 400);
-        }
-
-        return [(int) $page, (int) $perPage];
     }
 
     public function create(): ResponseInterface
@@ -281,26 +232,23 @@ abstract class ResourceController extends BaseController
         $errors = $this->payloadErrors($payload);
 
         if ($errors !== []) {
-            return $this->respond(['errors' => $errors], 422);
+            return $this->errorResponse($this->validationMessage($errors), 422);
         }
 
         $payload[$this->primaryKey] = $this->uuid();
         $model = $this->model();
 
         if (! $model->insert($payload, false)) {
-            return $this->respond(['message' => 'Gagal menyimpan data.'], 500);
+            return $this->errorResponse('Gagal menyimpan data.', 500);
         }
 
         $record = $model->find($payload[$this->primaryKey]);
 
         if ($record === null) {
-            return $this->respond(['message' => 'Data berhasil disimpan tetapi tidak dapat dibaca kembali.'], 500);
+            return $this->errorResponse('Data berhasil disimpan tetapi tidak dapat dibaca kembali.', 500);
         }
 
-        return $this->respond([
-            'data' => $record,
-            'message' => 'Data berhasil dibuat.',
-        ], 201);
+        return $this->successResponse($record, 201);
     }
 
     protected function jsonPayload(): array|ResponseInterface
@@ -308,14 +256,45 @@ abstract class ResourceController extends BaseController
         try {
             $payload = json_decode($this->request->getBody(), false, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException) {
-            return $this->respond(['message' => 'Body harus berupa JSON yang valid.'], 400);
+            return $this->errorResponse('Body harus berupa JSON yang valid.', 400);
         }
 
         if (! $payload instanceof \stdClass) {
-            return $this->respond(['message' => 'Body JSON harus berupa object.'], 400);
+            return $this->errorResponse('Body JSON harus berupa object.', 400);
         }
 
         return (array) $payload;
+    }
+
+    protected function successResponse(
+        mixed $data = null,
+        int $httpStatus = 200,
+    ): ResponseInterface {
+        return $this->respond([
+            'status' => 'success',
+            'data' => $data,
+            'message' => null,
+        ], $httpStatus);
+    }
+
+    protected function errorResponse(string $message, int $httpStatus): ResponseInterface
+    {
+        return $this->respond([
+            'status' => 'error',
+            'data' => null,
+            'message' => $message,
+        ], $httpStatus);
+    }
+
+    protected function validationMessage(array $errors): string
+    {
+        $messages = [];
+
+        foreach ($errors as $field => $message) {
+            $messages[] = sprintf('%s: %s', $field, $message);
+        }
+
+        return implode('; ', $messages);
     }
 
     protected function payloadErrors(

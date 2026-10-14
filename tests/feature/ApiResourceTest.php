@@ -16,7 +16,11 @@ final class ApiResourceTest extends CIUnitTestCase
         $result = $this->withBody('{')->post('/api/flights/airlines');
 
         $result->assertStatus(400);
-        $result->assertJSONFragment(['message' => 'Body harus berupa JSON yang valid.']);
+        $result->assertJSONFragment([
+            'status' => 'error',
+            'data' => null,
+            'message' => 'Body harus berupa JSON yang valid.',
+        ]);
     }
 
     public function testDetailRejectsInvalidUuid(): void
@@ -24,7 +28,11 @@ final class ApiResourceTest extends CIUnitTestCase
         $result = $this->get('/api/flights/airlines/not-a-uuid');
 
         $result->assertStatus(404);
-        $result->assertJSONFragment(['message' => 'Data tidak ditemukan.']);
+        $result->assertJSONFragment([
+            'status' => 'error',
+            'data' => null,
+            'message' => 'Data tidak ditemukan.',
+        ]);
     }
 
     public function testCreateRejectsMissingRequiredFields(): void
@@ -32,13 +40,13 @@ final class ApiResourceTest extends CIUnitTestCase
         $result = $this->withBody('{}')->post('/api/flights/airlines');
 
         $result->assertStatus(422);
-        $result->assertJSONFragment([
-            'errors' => [
-                'airline_code' => 'The airline_code field is required.',
-                'airline_name' => 'The airline_name field is required.',
-                'country' => 'The country field is required.',
-            ],
-        ]);
+        $body = json_decode($result->getJSON(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertSame('error', $body['status']);
+        $this->assertNull($body['data']);
+        $this->assertStringContainsString('airline_code:', $body['message']);
+        $this->assertStringContainsString('airline_name:', $body['message']);
+        $this->assertStringContainsString('country:', $body['message']);
     }
 
     public function testCreateRejectsEmptyValues(): void
@@ -51,13 +59,13 @@ final class ApiResourceTest extends CIUnitTestCase
         ], JSON_THROW_ON_ERROR))->post('/api/flights/airlines');
 
         $result->assertStatus(422);
-        $result->assertJSONFragment([
-            'errors' => [
-                'airline_code' => 'Field tidak boleh kosong.',
-                'airline_name' => 'Field tidak boleh kosong.',
-                'status' => 'Field tidak boleh null.',
-            ],
-        ]);
+        $body = json_decode($result->getJSON(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertSame('error', $body['status']);
+        $this->assertNull($body['data']);
+        $this->assertStringContainsString('airline_code: Field tidak boleh kosong.', $body['message']);
+        $this->assertStringContainsString('airline_name: Field tidak boleh kosong.', $body['message']);
+        $this->assertStringContainsString('status: Field tidak boleh null.', $body['message']);
     }
 
     public function testDeleteRejectsInvalidUuid(): void
@@ -65,7 +73,11 @@ final class ApiResourceTest extends CIUnitTestCase
         $result = $this->delete('/api/flights/airlines/not-a-uuid');
 
         $result->assertStatus(404);
-        $result->assertJSONFragment(['message' => 'Data tidak ditemukan.']);
+        $result->assertJSONFragment([
+            'status' => 'error',
+            'data' => null,
+            'message' => 'Data tidak ditemukan.',
+        ]);
     }
 
     public function testDeleteReturnsNotFoundWhenRecordDoesNotExist(): void
@@ -76,7 +88,11 @@ final class ApiResourceTest extends CIUnitTestCase
             $result = $this->delete('/api/flights/airlines/850a46d0-79c0-4db4-9241-51bdaea8f57d');
 
             $result->assertStatus(404);
-            $result->assertJSONFragment(['message' => 'Data tidak ditemukan.']);
+            $result->assertJSONFragment([
+                'status' => 'error',
+                'data' => null,
+                'message' => 'Data tidak ditemukan.',
+            ]);
         } finally {
             $db->query('DETACH DATABASE airport_operations');
         }
@@ -101,8 +117,10 @@ final class ApiResourceTest extends CIUnitTestCase
 
             $result->assertStatus(422);
             $result->assertJSONFragment([
-                'errors' => ['airline_code' => 'Field tidak boleh kosong.'],
+                'status' => 'error',
+                'data' => null,
             ]);
+            $this->assertStringContainsString('airline_code: Field tidak boleh kosong.', $result->getJSON());
         } finally {
             $db->query('DETACH DATABASE airport_operations');
         }
@@ -125,21 +143,40 @@ final class ApiResourceTest extends CIUnitTestCase
 
             $result->assertStatus(422);
             $result->assertJSONFragment([
-                'errors' => ['airline_name' => 'Field tidak boleh kosong.'],
+                'status' => 'error',
+                'data' => null,
             ]);
+            $this->assertStringContainsString('airline_name: Field tidak boleh kosong.', $result->getJSON());
         } finally {
             $db->query('DETACH DATABASE airport_operations');
         }
     }
 
-    public function testCollectionRejectsOutOfRangePageSize(): void
+    public function testCollectionReturnsAllRowsInStandardEnvelopeWithoutPagination(): void
     {
-        $result = $this->get('/api/flights/airlines?per_page=101');
+        $db = $this->attachAirlinesTable();
 
-        $result->assertStatus(400);
-        $result->assertJSONFragment([
-            'message' => 'Parameter page harus >= 1 dan per_page harus berada di antara 1 sampai 100.',
-        ]);
+        try {
+            foreach (['GA', 'QZ', 'JT'] as $index => $code) {
+                $db->table('airport_operations.airlines')->insert([
+                    'airline_id' => sprintf('850a46d0-79c0-4db4-9241-51bdaea8f5%02d', $index + 1),
+                    'airline_code' => $code,
+                ]);
+            }
+
+            $result = $this->get('/api/flights/airlines?page=1&per_page=1');
+
+            $result->assertStatus(200);
+            $body = json_decode($result->getJSON(), true, 512, JSON_THROW_ON_ERROR);
+
+            $this->assertSame(['status', 'data', 'message'], array_keys($body));
+            $this->assertSame('success', $body['status']);
+            $this->assertNull($body['message']);
+            $this->assertCount(3, $body['data']);
+            $this->assertArrayNotHasKey('meta', $body);
+        } finally {
+            $db->query('DETACH DATABASE airport_operations');
+        }
     }
 
     public function testDatabaseConfigReadsUsernameFromEnvironmentFile(): void

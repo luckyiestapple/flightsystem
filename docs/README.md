@@ -46,7 +46,7 @@ sebelum mengekspos endpoint ke jaringan publik.
 | Method | Endpoint | Kegunaan |
 | --- | --- | --- |
 | `POST` | `/api/flights/{resource}` | Membuat record |
-| `GET` | `/api/flights/{resource}` | Mengambil daftar dengan pagination |
+| `GET` | `/api/flights/{resource}` | Mengambil seluruh data |
 | `GET` | `/api/flights/search/{resource}` | Mencari, memfilter, dan mengurutkan data |
 | `GET` | `/api/flights/{resource}/{id}` | Mengambil detail satu record |
 | `PUT` | `/api/flights/{resource}/{id}` | Mengganti data record |
@@ -58,38 +58,42 @@ dengan endpoint `/api/flights/search/{resource}`.
 
 ## Bentuk respons
 
-Respons collection selalu memuat `data` berupa array dan metadata pagination:
+Semua respons sukses maupun gagal menggunakan tiga key yang sama:
+`status`, `data`, dan `message`. Respons sukses memakai `status: "success"`
+dan `message: null`; respons gagal memakai `status: "error"`, `data: null`,
+dan `message` berisi keterangan error.
 
 ```json
 {
-  "data": [],
-  "meta": {
-    "page": 1,
-    "per_page": 20,
-    "total": 0,
-    "total_pages": 0
-  }
+  "status": "success",
+  "data": {
+    "flight_id": "uuid-flight-001",
+    "flight_number": "GA204",
+    "flight_status": "SCHEDULED"
+  },
+  "message": null
 }
 ```
 
-Respons detail dan create memuat object `data`. Create mengembalikan HTTP `201`,
-pengambilan/pembaruan berhasil HTTP `200`, dan delete berhasil HTTP `200`
-dengan `message`.
+Pada collection/search, `data` berupa array record (termasuk array kosong jika
+tidak ditemukan). Pada detail/create/update, `data` berupa object record.
+Delete sukses mengembalikan `data: null`. Create mengembalikan HTTP `201`;
+operasi sukses lainnya mengembalikan HTTP `200`.
 
-Kesalahan menggunakan JSON. Kesalahan validasi berstatus `422` dan memiliki
-object `errors` yang dipetakan berdasarkan nama field. JSON tidak valid atau
-parameter query tidak valid mengembalikan `400`; record tidak ditemukan
-mengembalikan `404`; penghapusan record yang masih direferensikan mengembalikan
-`409`. Jika record yang akan dihapus sudah tidak ada, DELETE juga mengembalikan
-`404` dengan pesan `Data tidak ditemukan.`.
+Kesalahan validasi berstatus `422`; rincian kesalahan field disertakan dalam
+string `message`. JSON tidak valid atau parameter query tidak valid
+mengembalikan `400`; record tidak ditemukan mengembalikan `404`; penghapusan
+record yang masih direferensikan mengembalikan `409`. Jika record yang akan
+dihapus sudah tidak ada, DELETE juga mengembalikan `404` dengan pesan
+`Data tidak ditemukan.`.
 
 Contoh kesalahan:
 
 ```json
 {
-  "errors": {
-    "airline_code": "The airline_code field is required."
-  }
+  "status": "error",
+  "data": null,
+  "message": "airline_code: The airline_code field is required."
 }
 ```
 
@@ -206,15 +210,14 @@ Contoh:
 }
 ```
 
-## Membaca dan pagination
+## Membaca seluruh data
 
 ```http
-GET /api/flights/flights?page=2&per_page=25
+GET /api/flights/flights
 ```
 
-- `page`: bilangan bulat mulai dari `1`, default `1`.
-- `per_page`: bilangan bulat `1` sampai `100`, default `20`.
-- Parameter invalid menghasilkan HTTP `400`.
+Collection mengembalikan semua record tanpa pagination atau metadata tambahan.
+Parameter `page` dan `per_page` tidak digunakan.
 
 Detail:
 
@@ -279,7 +282,9 @@ mengembalikan:
 
 ```json
 {
-  "message": "Data berhasil dihapus."
+  "status": "success",
+  "data": null,
+  "message": null
 }
 ```
 
