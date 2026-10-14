@@ -25,6 +25,20 @@ final class ApiResourceTest extends CIUnitTestCase
         $result->assertJSONFragment(['message' => 'Data tidak ditemukan.']);
     }
 
+    public function testCreateRejectsMissingRequiredFields(): void
+    {
+        $result = $this->withBody('{}')->post('/api/v1/airlines');
+
+        $result->assertStatus(422);
+        $result->assertJSONFragment([
+            'errors' => [
+                'airline_code' => 'The airline_code field is required.',
+                'airline_name' => 'The airline_name field is required.',
+                'country' => 'The country field is required.',
+            ],
+        ]);
+    }
+
     public function testCollectionRejectsOutOfRangePageSize(): void
     {
         $result = $this->get('/api/v1/airlines?per_page=101');
