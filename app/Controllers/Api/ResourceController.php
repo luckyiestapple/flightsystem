@@ -373,7 +373,7 @@ abstract class ResourceController extends BaseController
             }
 
             if ($builder->countAllResults() > 0) {
-                $errors[$field] = 'Nilai field harus unik.';
+                $errors[$field] = sprintf('Kode %s sudah digunakan.', $payload[$field]);
             }
         }
 

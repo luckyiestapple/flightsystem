@@ -125,7 +125,46 @@ final class ApiResourceTest extends CIUnitTestCase
                 'error' => 400,
             ]);
             $this->assertSame(
-                'Nilai field harus unik.',
+                'Kode GA sudah digunakan.',
+                json_decode($result->getJSON(), true, 512, JSON_THROW_ON_ERROR)['messages']['airline_code'],
+            );
+        } finally {
+            $db->query('DETACH DATABASE airport_operations');
+        }
+    }
+
+    public function testUpdateRejectsAirlineCodeUsedByAnotherRecord(): void
+    {
+        $db = $this->attachAirlinesTable();
+        $airlineId = '850a46d0-79c0-4db4-9241-51bdaea8f57d';
+        $db->table('airport_operations.airlines')->insertBatch([
+            [
+                'airline_id' => $airlineId,
+                'airline_code' => 'GA',
+                'airline_name' => 'Airline Satu',
+                'country' => 'Indonesia',
+                'status' => 'ACTIVE',
+            ],
+            [
+                'airline_id' => '01a423ce-cc53-4c18-a522-4de8ba31b2d5',
+                'airline_code' => 'QZ',
+                'airline_name' => 'Airline Dua',
+                'country' => 'Indonesia',
+                'status' => 'ACTIVE',
+            ],
+        ]);
+
+        try {
+            $result = $this->withBody(json_encode([
+                'airline_code' => 'QZ',
+                'airline_name' => 'Airline Satu Diubah',
+                'country' => 'Indonesia',
+                'status' => 'ACTIVE',
+            ], JSON_THROW_ON_ERROR))->put('/api/flights/airlines/' . $airlineId);
+
+            $result->assertStatus(400);
+            $this->assertSame(
+                'Kode QZ sudah digunakan.',
                 json_decode($result->getJSON(), true, 512, JSON_THROW_ON_ERROR)['messages']['airline_code'],
             );
         } finally {

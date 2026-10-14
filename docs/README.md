@@ -44,12 +44,12 @@ Panduan dan berkas uji coba yang dapat langsung dipakai:
 
 - [Contoh cURL untuk PowerShell](./curl.md)
 - [Koleksi Postman v2.1](./postman_collection.json) — impor JSON ini ke Postman,
-  lalu jalankan request sesuai urutan di Collection Runner.
+  lalu kirim request secara manual. Koleksi tidak memakai variables atau scripts.
 
-Kedua panduan menggunakan resource `airlines`, membuat record pengujian sendiri,
-dan memakai ID yang dikembalikan API untuk detail, edit, PATCH, serta delete.
-Jalankan terhadap database pengujian atau lingkungan lokal karena request delete
-menghapus record yang dibuat selama uji coba.
+Koleksi Postman memakai URL localhost dan nilai contoh statis. Ganti
+`REPLACE_WITH_AIRLINE_ID` dengan `airline_id` yang dikembalikan POST sebelum
+mencoba detail, update, atau delete. Jalankan terhadap database uji/lokal:
+request delete menghapus record secara permanen.
 
 ## Daftar endpoint
 
@@ -105,7 +105,7 @@ Contoh kesalahan:
   "status": 400,
   "error": 400,
   "messages": {
-    "airline_code": "Nilai field harus unik."
+    "airline_code": "Kode GA sudah digunakan."
   }
 }
 ```

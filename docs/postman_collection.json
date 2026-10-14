@@ -1,33 +1,55 @@
 {
   "info": {
     "_postman_id": "bd5eaf6f-e472-43f7-9f21-e0e74a4d70b8",
-    "name": "Flight API - CRUD Smoke Test",
-    "description": "Uji coba CRUD airlines. Jalankan seluruh request secara berurutan di Collection Runner. Request membuat dan membersihkan fixture yang diperlukan. Respons sukses berisi status numerik, message, data; respons error berisi status, error, messages.",
+    "name": "Flight API - CRUD Manual Tests",
+    "description": "Request manual untuk CRUD airlines. Tidak memakai variables, pre-request scripts, atau test scripts. Ganti teks REPLACE_WITH_AIRLINE_ID dengan airline_id dari respons POST yang ingin diuji. Untuk skenario duplikat, pastikan kode GA sudah ada di database. Base URL contoh: http://localhost:8081.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
-  "variable": [
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:8081"
-    },
-    {
-      "key": "airlineId",
-      "value": ""
-    },
-    {
-      "key": "airlineCode",
-      "value": ""
-    },
-    {
-      "key": "missingId",
-      "value": "00000000-0000-4000-8000-000000000000"
-    }
-  ],
   "item": [
     {
-      "name": "3. Input data (POST)",
+      "name": "1. GET semua data",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "http://localhost:8081/api/flights/airlines"
+      }
+    },
+    {
+      "name": "2. GET dengan pencarian",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "http://localhost:8081/api/flights/search/airlines?q=GA"
+      }
+    },
+    {
+      "name": "3. GET detail berdasarkan ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "http://localhost:8081/api/flights/airlines/REPLACE_WITH_AIRLINE_ID"
+      }
+    },
+    {
+      "name": "4. POST tambah data",
       "request": {
         "method": "POST",
+        "description": "Contoh sukses. Jika TST001 sudah ada, ganti airline_code dengan kode baru sebelum mengirim.",
         "header": [
           {
             "key": "Accept",
@@ -40,125 +62,21 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"airline_code\": \"{{airlineCode}}\",\n  \"airline_name\": \"Airline Uji Coba\",\n  \"country\": \"Indonesia\",\n  \"contact\": \"+62-21-555-0100\",\n  \"status\": \"ACTIVE\"\n}",
+          "raw": "{\n  \"airline_code\": \"TST001\",\n  \"airline_name\": \"Airline Uji Coba\",\n  \"country\": \"Indonesia\",\n  \"contact\": \"+62-21-555-0100\",\n  \"status\": \"ACTIVE\"\n}",
           "options": {
             "raw": {
               "language": "json"
             }
           }
         },
-        "url": "{{baseUrl}}/api/flights/airlines"
-      },
-      "event": [
-        {
-          "listen": "prerequest",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "const guid = pm.variables.replaceIn('{{$guid}}').replace(/-/g, '');",
-              "const airlineCode = 'T' + guid.substring(0, 9);",
-              "pm.collectionVariables.set('airlineCode', airlineCode);"
-            ]
-          }
-        },
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 201 Created', function () { pm.response.to.have.status(201); });",
-              "const body = pm.response.json();",
-              "pm.test('Response sukses sesuai envelope', function () { pm.expect(body.status).to.eql(201); pm.expect(body.message).to.eql('Data berhasil ditambahkan.'); pm.expect(body.data).to.be.an('object'); });",
-              "pm.test('ID airline berhasil dibuat', function () { pm.expect(body.data.airline_id).to.be.a('string'); });",
-              "pm.collectionVariables.set('airlineId', body.data.airline_id);"
-            ]
-          }
-        }
-      ]
+        "url": "http://localhost:8081/api/flights/airlines"
+      }
     },
     {
-      "name": "1. Ambil semua data (GET collection)",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json"
-          }
-        ],
-        "url": "{{baseUrl}}/api/flights/airlines"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
-              "const body = pm.response.json();",
-              "pm.test('Response collection sesuai envelope', function () { pm.expect(body.status).to.eql(200); pm.expect(body.message).to.eql('Data berhasil diambil.'); pm.expect(body.data).to.be.an('array'); });",
-              "pm.test('Collection memuat record yang baru dibuat', function () { pm.expect(body.data.some(function (item) { return item.airline_id === pm.collectionVariables.get('airlineId'); })).to.eql(true); });"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "2. Ambil detail data (GET by ID)",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json"
-          }
-        ],
-        "url": "{{baseUrl}}/api/flights/airlines/{{airlineId}}"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
-              "const body = pm.response.json();",
-              "pm.test('Detail sesuai envelope dan ID yang benar', function () { pm.expect(body.status).to.eql(200); pm.expect(body.message).to.eql('Data berhasil diambil.'); pm.expect(body.data.airline_id).to.eql(pm.collectionVariables.get('airlineId')); });"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "4. Ambil data yang tidak ada (404)",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json"
-          }
-        ],
-        "url": "{{baseUrl}}/api/flights/airlines/{{missingId}}"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 404 Not Found', function () { pm.response.to.have.status(404); });",
-              "const body = pm.response.json();",
-              "pm.test('404 sesuai envelope error', function () { pm.expect(body.status).to.eql(404); pm.expect(body.error).to.eql(404); pm.expect(body.messages._request).to.eql('Data tidak ditemukan.'); });"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "5. POST data tidak valid (kode maskapai duplikat, 400)",
+      "name": "5. POST data tidak valid - kode GA sudah digunakan (400)",
       "request": {
         "method": "POST",
+        "description": "Prasyarat: kode GA sudah dipakai record di database. Diharapkan HTTP 400 dengan messages.airline_code bernilai: Kode GA sudah digunakan.",
         "header": [
           {
             "key": "Accept",
@@ -171,33 +89,21 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"airline_code\": \"{{airlineCode}}\",\n  \"airline_name\": \"Kode Duplikat\",\n  \"country\": \"Indonesia\"\n}",
+          "raw": "{\n  \"airline_code\": \"GA\",\n  \"airline_name\": \"Kode Duplikat\",\n  \"country\": \"Indonesia\",\n  \"status\": \"ACTIVE\"\n}",
           "options": {
             "raw": {
               "language": "json"
             }
           }
         },
-        "url": "{{baseUrl}}/api/flights/airlines"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 400 Bad Request', function () { pm.response.to.have.status(400); });",
-              "const body = pm.response.json();",
-              "pm.test('Validasi unik ditampilkan pada field airline_code', function () { pm.expect(body.status).to.eql(400); pm.expect(body.error).to.eql(400); pm.expect(body.messages.airline_code).to.eql('Nilai field harus unik.'); });"
-            ]
-          }
-        }
-      ]
+        "url": "http://localhost:8081/api/flights/airlines"
+      }
     },
     {
-      "name": "5. Edit data lengkap (PUT)",
+      "name": "6. PUT ubah seluruh data",
       "request": {
         "method": "PUT",
+        "description": "Ganti REPLACE_WITH_AIRLINE_ID dengan ID dari respons POST tambah data. Gunakan airline_code yang sama dengan record tersebut.",
         "header": [
           {
             "key": "Accept",
@@ -210,31 +116,18 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"airline_code\": \"{{airlineCode}}\",\n  \"airline_name\": \"Airline Uji Coba Diperbarui\",\n  \"country\": \"Indonesia\",\n  \"contact\": \"+62-21-555-0101\",\n  \"status\": \"ACTIVE\"\n}",
+          "raw": "{\n  \"airline_code\": \"TST001\",\n  \"airline_name\": \"Airline Uji Coba Diperbarui\",\n  \"country\": \"Indonesia\",\n  \"contact\": \"+62-21-555-0101\",\n  \"status\": \"ACTIVE\"\n}",
           "options": {
             "raw": {
               "language": "json"
             }
           }
         },
-        "url": "{{baseUrl}}/api/flights/airlines/{{airlineId}}"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
-              "const body = pm.response.json();",
-              "pm.test('PUT berhasil memperbarui record', function () { pm.expect(body.status).to.eql(200); pm.expect(body.message).to.eql('Data berhasil diperbarui.'); pm.expect(body.data.airline_name).to.eql('Airline Uji Coba Diperbarui'); });"
-            ]
-          }
-        }
-      ]
+        "url": "http://localhost:8081/api/flights/airlines/REPLACE_WITH_AIRLINE_ID"
+      }
     },
     {
-      "name": "6. Update sebagian (PATCH)",
+      "name": "7. PATCH ubah sebagian kolom",
       "request": {
         "method": "PATCH",
         "header": [
@@ -249,33 +142,21 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"country\": \"Indonesia - Uji PATCH\"\n}",
+          "raw": "{\n  \"country\": \"Indonesia - PATCH\"\n}",
           "options": {
             "raw": {
               "language": "json"
             }
           }
         },
-        "url": "{{baseUrl}}/api/flights/airlines/{{airlineId}}"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
-              "const body = pm.response.json();",
-              "pm.test('PATCH hanya mengubah field yang dikirim', function () { pm.expect(body.status).to.eql(200); pm.expect(body.message).to.eql('Data berhasil diperbarui.'); pm.expect(body.data.country).to.eql('Indonesia - Uji PATCH'); pm.expect(body.data.airline_name).to.eql('Airline Uji Coba Diperbarui'); });"
-            ]
-          }
-        }
-      ]
+        "url": "http://localhost:8081/api/flights/airlines/REPLACE_WITH_AIRLINE_ID"
+      }
     },
     {
-      "name": "Fixture untuk uji PUT dengan kode milik record lain",
+      "name": "Fixture - POST record untuk uji PUT duplikat",
       "request": {
         "method": "POST",
+        "description": "Kirim request ini lalu salin data.airline_id dari respons ke URL request PUT konflik dan cleanup. Jika FX901 sudah terpakai, ganti airline_code.",
         "header": [
           {
             "key": "Accept",
@@ -288,42 +169,21 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"airline_code\": \"{{conflictingAirlineCode}}\",\n  \"airline_name\": \"Fixture Uji Konflik\",\n  \"country\": \"Indonesia\",\n  \"status\": \"ACTIVE\"\n}",
+          "raw": "{\n  \"airline_code\": \"FX901\",\n  \"airline_name\": \"Fixture Uji Konflik\",\n  \"country\": \"Indonesia\",\n  \"status\": \"ACTIVE\"\n}",
           "options": {
             "raw": {
               "language": "json"
             }
           }
         },
-        "url": "{{baseUrl}}/api/flights/airlines"
-      },
-      "event": [
-        {
-          "listen": "prerequest",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "const guid = pm.variables.replaceIn('{{$guid}}').replace(/-/g, '');",
-              "pm.collectionVariables.set('conflictingAirlineCode', 'F' + guid.substring(0, 9));"
-            ]
-          }
-        },
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Fixture berhasil dibuat', function () { pm.response.to.have.status(201); });",
-              "pm.collectionVariables.set('conflictingAirlineId', pm.response.json().data.airline_id);"
-            ]
-          }
-        }
-      ]
+        "url": "http://localhost:8081/api/flights/airlines"
+      }
     },
     {
-      "name": "8. PUT dengan kode maskapai milik record lain (400)",
+      "name": "8. PUT dengan kode GA milik record lain (400)",
       "request": {
         "method": "PUT",
+        "description": "Prasyarat: kode GA sudah dipakai record lain. Jalankan POST fixture, salin airline_id responsnya ke URL request ini. Diharapkan HTTP 400 dengan messages.airline_code bernilai: Kode GA sudah digunakan.",
         "header": [
           {
             "key": "Accept",
@@ -336,31 +196,18 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"airline_code\": \"{{conflictingAirlineCode}}\",\n  \"airline_name\": \"Airline Uji Coba Diperbarui\",\n  \"country\": \"Indonesia\",\n  \"contact\": \"+62-21-555-0101\",\n  \"status\": \"ACTIVE\"\n}",
+          "raw": "{\n  \"airline_code\": \"GA\",\n  \"airline_name\": \"Fixture Uji Konflik\",\n  \"country\": \"Indonesia\",\n  \"status\": \"ACTIVE\"\n}",
           "options": {
             "raw": {
               "language": "json"
             }
           }
         },
-        "url": "{{baseUrl}}/api/flights/airlines/{{airlineId}}"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 400 Bad Request', function () { pm.response.to.have.status(400); });",
-              "const body = pm.response.json();",
-              "pm.test('Kode yang dipakai record lain ditolak', function () { pm.expect(body.status).to.eql(400); pm.expect(body.error).to.eql(400); pm.expect(body.messages.airline_code).to.eql('Nilai field harus unik.'); });"
-            ]
-          }
-        }
-      ]
+        "url": "http://localhost:8081/api/flights/airlines/REPLACE_WITH_FIXTURE_AIRLINE_ID"
+      }
     },
     {
-      "name": "Hapus fixture konflik",
+      "name": "Cleanup - DELETE fixture konflik",
       "request": {
         "method": "DELETE",
         "header": [
@@ -369,22 +216,24 @@
             "value": "application/json"
           }
         ],
-        "url": "{{baseUrl}}/api/flights/airlines/{{conflictingAirlineId}}"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Fixture dibersihkan', function () { pm.response.to.have.status(200); });"
-            ]
-          }
-        }
-      ]
+        "url": "http://localhost:8081/api/flights/airlines/REPLACE_WITH_FIXTURE_AIRLINE_ID"
+      }
     },
     {
-      "name": "9. Tampilkan data yang dicari",
+      "name": "9. DELETE hapus data",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "http://localhost:8081/api/flights/airlines/REPLACE_WITH_AIRLINE_ID"
+      }
+    },
+    {
+      "name": "10. GET data yang sudah dihapus - 404",
       "request": {
         "method": "GET",
         "header": [
@@ -393,24 +242,11 @@
             "value": "application/json"
           }
         ],
-        "url": "{{baseUrl}}/api/flights/search/airlines?q={{airlineCode}}"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
-              "const body = pm.response.json();",
-              "pm.test('Hasil pencarian memuat airline uji coba', function () { pm.expect(body.status).to.eql(200); pm.expect(body.message).to.eql('Data berhasil diambil.'); pm.expect(body.data).to.be.an('array'); pm.expect(body.data.some(function (item) { return item.airline_code === pm.collectionVariables.get('airlineCode'); })).to.eql(true); });"
-            ]
-          }
-        }
-      ]
+        "url": "http://localhost:8081/api/flights/airlines/REPLACE_WITH_AIRLINE_ID"
+      }
     },
     {
-      "name": "11a. POST tanpa body (400)",
+      "name": "11a. POST tanpa body - 400",
       "request": {
         "method": "POST",
         "header": [
@@ -432,24 +268,11 @@
             }
           }
         },
-        "url": "{{baseUrl}}/api/flights/airlines"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 400 Bad Request', function () { pm.response.to.have.status(400); });",
-              "const body = pm.response.json();",
-              "pm.test('Body kosong menghasilkan error terstruktur', function () { pm.expect(body.status).to.eql(400); pm.expect(body.error).to.eql(400); pm.expect(body.messages._request).to.eql('Body harus berupa JSON yang valid.'); });"
-            ]
-          }
-        }
-      ]
+        "url": "http://localhost:8081/api/flights/airlines"
+      }
     },
     {
-      "name": "11b. POST dengan object kosong (400)",
+      "name": "11b. POST object kosong - 400",
       "request": {
         "method": "POST",
         "header": [
@@ -471,24 +294,11 @@
             }
           }
         },
-        "url": "{{baseUrl}}/api/flights/airlines"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 400 Bad Request', function () { pm.response.to.have.status(400); });",
-              "const body = pm.response.json();",
-              "pm.test('Field wajib muncul di messages', function () { pm.expect(body.status).to.eql(400); pm.expect(body.error).to.eql(400); pm.expect(body.messages).to.have.property('airline_code'); pm.expect(body.messages).to.have.property('airline_name'); pm.expect(body.messages).to.have.property('country'); });"
-            ]
-          }
-        }
-      ]
+        "url": "http://localhost:8081/api/flights/airlines"
+      }
     },
     {
-      "name": "11c. POST dengan JSON rusak (400)",
+      "name": "11c. POST JSON rusak - 400",
       "request": {
         "method": "POST",
         "header": [
@@ -510,73 +320,8 @@
             }
           }
         },
-        "url": "{{baseUrl}}/api/flights/airlines"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 400 Bad Request', function () { pm.response.to.have.status(400); });",
-              "const body = pm.response.json();",
-              "pm.test('JSON rusak menghasilkan error terstruktur', function () { pm.expect(body.status).to.eql(400); pm.expect(body.error).to.eql(400); pm.expect(body.messages._request).to.eql('Body harus berupa JSON yang valid.'); });"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "7. Delete data (200)",
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json"
-          }
-        ],
-        "url": "{{baseUrl}}/api/flights/airlines/{{airlineId}}"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
-              "const body = pm.response.json();",
-              "pm.test('Delete berhasil dan record dihapus', function () { pm.expect(body.status).to.eql(200); pm.expect(body.message).to.eql('Data dengan id ' + pm.collectionVariables.get('airlineId') + ' berhasil dihapus.'); pm.expect(body.data).to.eql(null); });"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "8. Delete ulang untuk memastikan data sudah terhapus (404)",
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "Accept",
-            "value": "application/json"
-          }
-        ],
-        "url": "{{baseUrl}}/api/flights/airlines/{{airlineId}}"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 404 Not Found: record sudah tidak ada', function () { pm.response.to.have.status(404); });",
-              "const body = pm.response.json();",
-              "pm.test('API memastikan record sudah terhapus', function () { pm.expect(body.status).to.eql(404); pm.expect(body.error).to.eql(404); pm.expect(body.messages._request).to.eql('Data tidak ditemukan.'); });"
-            ]
-          }
-        }
-      ]
+        "url": "http://localhost:8081/api/flights/airlines"
+      }
     }
   ]
 }

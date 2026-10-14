@@ -76,7 +76,7 @@ Contoh respons:
   "status": 400,
   "error": 400,
   "messages": {
-    "airline_code": "Nilai field harus unik."
+    "airline_code": "Kode T123456789 sudah digunakan."
   }
 }
 ```
