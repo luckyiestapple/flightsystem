@@ -7,8 +7,21 @@ Semua endpoint menggunakan prefix `/api/flights`.
 ## Persiapan
 
 Migration saat ini ditulis khusus untuk PostgreSQL dan membuat schema
-`airport_operations`. Pastikan koneksi `default` pada `app/Config/Database.php`
-menggunakan driver `Postgre` dan database yang benar sebelum menjalankan:
+`airport_operations`. Konfigurasi koneksi `default` membaca nilai berikut dari
+file `env` (salin `env` menjadi `.env` jika proyek Anda belum memakai file
+environment):
+
+```ini
+database.default.hostname = localhost
+database.default.database = nama_database
+database.default.username = nama_user
+database.default.password = kata_sandi
+database.default.DBDriver = Postgre
+database.default.port = 5432
+```
+
+Driver default adalah `Postgre` dan port default `5432`. Isi nilai koneksi sesuai
+server PostgreSQL Anda sebelum menjalankan:
 
 ```sh
 php spark migrate

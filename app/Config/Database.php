@@ -25,26 +25,21 @@ class Database extends Config
      * @var array<string, mixed>
      */
     public array $default = [
-        'DSN'          => '',
-        'hostname'     => 'localhost',
-        'username'     => '',
-        'password'     => '',
-        'database'     => '',
-        'DBDriver'     => 'MySQLi',
-        'DBPrefix'     => '',
-        'pConnect'     => false,
-        'DBDebug'      => true,
-        'charset'      => 'utf8mb4',
-        'DBCollat'     => 'utf8mb4_general_ci',
-        'swapPre'      => '',
-        'encrypt'      => false,
-        'compress'     => false,
-        'strictOn'     => false,
-        'failover'     => [],
-        'port'         => 3306,
-        'numberNative' => false,
-        'foundRows'    => false,
-        'dateFormat'   => [
+        'DSN'        => '',
+        'hostname'   => 'localhost',
+        'username'   => '',
+        'password'   => '',
+        'database'   => '',
+        'schema'     => 'public',
+        'DBDriver'   => 'Postgre',
+        'DBPrefix'   => '',
+        'pConnect'   => false,
+        'DBDebug'    => true,
+        'charset'    => 'utf8',
+        'swapPre'    => '',
+        'failover'   => [],
+        'port'       => 5432,
+        'dateFormat' => [
             'date'     => 'Y-m-d',
             'datetime' => 'Y-m-d H:i:s',
             'time'     => 'H:i:s',
@@ -193,6 +188,18 @@ class Database extends Config
     public function __construct()
     {
         parent::__construct();
+
+        $this->default = array_merge($this->default, [
+            'DSN'      => env('database.default.DSN', ''),
+            'hostname' => env('database.default.hostname', 'localhost'),
+            'username' => env('database.default.username', ''),
+            'password' => env('database.default.password', ''),
+            'database' => env('database.default.database', ''),
+            'schema'   => env('database.default.schema', 'public'),
+            'DBDriver' => env('database.default.DBDriver', 'Postgre'),
+            'DBPrefix' => env('database.default.DBPrefix', ''),
+            'port'     => (int) env('database.default.port', 5432),
+        ]);
 
         // Ensure that we always set the database group to 'tests' if
         // we are currently running an automated test suite, so that
