@@ -16,6 +16,8 @@ class FlightModel extends Model
         'flight_number',
         'airline_id',
         'aircraft_id',
+        'place_id',
+        'pilot_id',
         'route_id',
         'departure_gate_id',
         'arrival_gate_id',

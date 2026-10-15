@@ -1,0 +1,292 @@
+CRITICAL - 2026-10-14 16:15:27 --> CodeIgniter\Exceptions\InvalidArgumentException: "airport_operations" is not a valid database connection group.
+[Method: POST, Route: api/flights/airlines]
+in SYSTEMPATH\Database\Config.php on line 68.
+ 1 SYSTEMPATH\Validation\Rules.php(213): CodeIgniter\Database\Config::connect('airport_operations')
+ 2 SYSTEMPATH\Validation\Rules.php(168): CodeIgniter\Validation\Rules->prepareUniqueQuery('T994527238', 'airline_code', [...])
+ 3 SYSTEMPATH\Validation\StrictRules\Rules.php(189): CodeIgniter\Validation\Rules->is_unique('T994527238', 'airport_operations.airlines.airline_code', [...])
+ 4 SYSTEMPATH\Validation\Validation.php(321): CodeIgniter\Validation\StrictRules\Rules->is_unique('T994527238', 'airport_operations.airlines.airline_code', [...], null, 'airline_code')
+ 5 SYSTEMPATH\Validation\Validation.php(198): CodeIgniter\Validation\Validation->processRules('airline_code', 'airline_code', 'T994527238', [...], [...], 'airline_code')
+ 6 SYSTEMPATH\Controller.php(153): CodeIgniter\Validation\Validation->run([...], null, null)
+ 7 APPPATH\Controllers\Api\ResourceController.php(370): CodeIgniter\Controller->validateData([...], [...])
+ 8 APPPATH\Controllers\Api\ResourceController.php(232): App\Controllers\Api\ResourceController->payloadErrors([...])
+ 9 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Api\ResourceController->create()
+10 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Airlines))
+11 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+12 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+13 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+14 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+15 SYSTEMPATH\rewrite.php(44): require_once('D:\\Techx\\hert\\flight\\public\\index.php')
+CRITICAL - 2026-10-14 16:20:57 --> CodeIgniter\Exceptions\InvalidArgumentException: "airport_operations" is not a valid database connection group.
+[Method: POST, Route: api/flights/airlines]
+in SYSTEMPATH\Database\Config.php on line 68.
+ 1 SYSTEMPATH\Validation\Rules.php(213): CodeIgniter\Database\Config::connect('airport_operations')
+ 2 SYSTEMPATH\Validation\Rules.php(168): CodeIgniter\Validation\Rules->prepareUniqueQuery('ID', 'airline_code', [...])
+ 3 SYSTEMPATH\Validation\StrictRules\Rules.php(189): CodeIgniter\Validation\Rules->is_unique('ID', 'airport_operations.airlines.airline_code', [...])
+ 4 SYSTEMPATH\Validation\Validation.php(321): CodeIgniter\Validation\StrictRules\Rules->is_unique('ID', 'airport_operations.airlines.airline_code', [...], null, 'airline_code')
+ 5 SYSTEMPATH\Validation\Validation.php(198): CodeIgniter\Validation\Validation->processRules('airline_code', 'airline_code', 'ID', [...], [...], 'airline_code')
+ 6 SYSTEMPATH\Controller.php(153): CodeIgniter\Validation\Validation->run([...], null, null)
+ 7 APPPATH\Controllers\Api\ResourceController.php(370): CodeIgniter\Controller->validateData([...], [...])
+ 8 APPPATH\Controllers\Api\ResourceController.php(232): App\Controllers\Api\ResourceController->payloadErrors([...])
+ 9 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Api\ResourceController->create()
+10 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Airlines))
+11 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+12 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+13 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+14 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+15 SYSTEMPATH\rewrite.php(44): require_once('D:\\Techx\\hert\\flight\\public\\index.php')
+CRITICAL - 2026-10-14 16:21:21 --> CodeIgniter\Exceptions\InvalidArgumentException: "airport_operations" is not a valid database connection group.
+[Method: POST, Route: api/flights/airlines]
+in SYSTEMPATH\Database\Config.php on line 68.
+ 1 SYSTEMPATH\Validation\Rules.php(213): CodeIgniter\Database\Config::connect('airport_operations')
+ 2 SYSTEMPATH\Validation\Rules.php(168): CodeIgniter\Validation\Rules->prepareUniqueQuery('IDO', 'airline_code', [...])
+ 3 SYSTEMPATH\Validation\StrictRules\Rules.php(189): CodeIgniter\Validation\Rules->is_unique('IDO', 'airport_operations.airlines.airline_code', [...])
+ 4 SYSTEMPATH\Validation\Validation.php(321): CodeIgniter\Validation\StrictRules\Rules->is_unique('IDO', 'airport_operations.airlines.airline_code', [...], null, 'airline_code')
+ 5 SYSTEMPATH\Validation\Validation.php(198): CodeIgniter\Validation\Validation->processRules('airline_code', 'airline_code', 'IDO', [...], [...], 'airline_code')
+ 6 SYSTEMPATH\Controller.php(153): CodeIgniter\Validation\Validation->run([...], null, null)
+ 7 APPPATH\Controllers\Api\ResourceController.php(370): CodeIgniter\Controller->validateData([...], [...])
+ 8 APPPATH\Controllers\Api\ResourceController.php(232): App\Controllers\Api\ResourceController->payloadErrors([...])
+ 9 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Api\ResourceController->create()
+10 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Airlines))
+11 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+12 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+13 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+14 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+15 SYSTEMPATH\rewrite.php(44): require_once('D:\\Techx\\hert\\flight\\public\\index.php')
+CRITICAL - 2026-10-14 16:21:28 --> CodeIgniter\Exceptions\InvalidArgumentException: "airport_operations" is not a valid database connection group.
+[Method: POST, Route: api/flights/airlines]
+in SYSTEMPATH\Database\Config.php on line 68.
+ 1 SYSTEMPATH\Validation\Rules.php(213): CodeIgniter\Database\Config::connect('airport_operations')
+ 2 SYSTEMPATH\Validation\Rules.php(168): CodeIgniter\Validation\Rules->prepareUniqueQuery('IDOOOOO', 'airline_code', [...])
+ 3 SYSTEMPATH\Validation\StrictRules\Rules.php(189): CodeIgniter\Validation\Rules->is_unique('IDOOOOO', 'airport_operations.airlines.airline_code', [...])
+ 4 SYSTEMPATH\Validation\Validation.php(321): CodeIgniter\Validation\StrictRules\Rules->is_unique('IDOOOOO', 'airport_operations.airlines.airline_code', [...], null, 'airline_code')
+ 5 SYSTEMPATH\Validation\Validation.php(198): CodeIgniter\Validation\Validation->processRules('airline_code', 'airline_code', 'IDOOOOO', [...], [...], 'airline_code')
+ 6 SYSTEMPATH\Controller.php(153): CodeIgniter\Validation\Validation->run([...], null, null)
+ 7 APPPATH\Controllers\Api\ResourceController.php(370): CodeIgniter\Controller->validateData([...], [...])
+ 8 APPPATH\Controllers\Api\ResourceController.php(232): App\Controllers\Api\ResourceController->payloadErrors([...])
+ 9 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Api\ResourceController->create()
+10 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Airlines))
+11 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+12 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+13 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+14 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+15 SYSTEMPATH\rewrite.php(44): require_once('D:\\Techx\\hert\\flight\\public\\index.php')
+ERROR - 2026-10-14 16:24:22 --> Unable to prepare statement: no such table: airport_operations.db_airlines
+in SYSTEMPATH\Database\SQLite3\Connection.php on line 159.
+ 1 SYSTEMPATH\Database\SQLite3\Connection.php(159): SQLite3->query('SELECT COUNT(*) AS `numrows`
+FROM `airport_operations`.`db_airlines`
+WHERE `airline_code` = \' \'')
+ 2 SYSTEMPATH\Database\BaseConnection.php(905): CodeIgniter\Database\SQLite3\Connection->execute('SELECT COUNT(*) AS `numrows`
+FROM `airport_operations`.`db_airlines`
+WHERE `airline_code` = \' \'')
+ 3 SYSTEMPATH\Database\BaseConnection.php(822): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*) AS `numrows`
+FROM `airport_operations`.`db_airlines`
+WHERE `airline_code` = \' \'')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1744): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `airport_operations`.`db_airlines`
+WHERE `airline_code` = :airline_code:', [...], false)
+ 5 APPPATH\Controllers\Api\ResourceController.php(378): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 6 APPPATH\Controllers\Api\ResourceController.php(234): App\Controllers\Api\ResourceController->payloadErrors([...])
+ 7 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Api\ResourceController->create()
+ 8 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Airlines))
+ 9 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(Object(CodeIgniter\Router\RouteCollection), Object(Config\Cache), true)
+10 SYSTEMPATH\Test\FeatureTestTrait.php(235): CodeIgniter\CodeIgniter->run(Object(CodeIgniter\Router\RouteCollection), true)
+11 SYSTEMPATH\Test\FeatureTestTrait.php(271): Tests\Feature\ApiResourceTest->call('POST', '/api/flights/airlines', null)
+12 ROOTPATH\tests\feature\ApiResourceTest.php(59): Tests\Feature\ApiResourceTest->post('/api/flights/airlines')
+13 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(1548): Tests\Feature\ApiResourceTest->testCreateRejectsEmptyValues()
+14 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(686): PHPUnit\Framework\TestCase->runTest()
+15 VENDORPATH\phpunit\phpunit\src\Framework\TestRunner.php(106): PHPUnit\Framework\TestCase->runBare()
+16 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(516): PHPUnit\Framework\TestRunner->run(Object(Tests\Feature\ApiResourceTest))
+17 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestCase->run()
+18 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+19 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+20 VENDORPATH\phpunit\phpunit\src\TextUI\TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+21 VENDORPATH\phpunit\phpunit\src\TextUI\Application.php(204): PHPUnit\TextUI\TestRunner->run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+22 VENDORPATH\phpunit\phpunit\phpunit(104): PHPUnit\TextUI\Application->run([...])
+23 VENDORPATH\bin\phpunit(122): include('D:\\Techx\\hert\\flight\\vendor\\phpunit\\phpunit\\phpunit')
+ERROR - 2026-10-14 16:24:47 --> Unable to prepare statement: no such column: origin_airport_id
+in SYSTEMPATH\Database\SQLite3\Connection.php on line 159.
+ 1 SYSTEMPATH\Database\SQLite3\Connection.php(159): SQLite3->query('SELECT COUNT(*) AS `numrows`
+FROM `airport_operations`.`db_airports`
+WHERE `origin_airport_id` = \'850a46d0-79c0-4db4-9241-51bdaea8f57d\'')
+ 2 SYSTEMPATH\Database\BaseConnection.php(905): CodeIgniter\Database\SQLite3\Connection->execute('SELECT COUNT(*) AS `numrows`
+FROM `airport_operations`.`db_airports`
+WHERE `origin_airport_id` = \'850a46d0-79c0-4db4-9241-51bdaea8f57d\'')
+ 3 SYSTEMPATH\Database\BaseConnection.php(822): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*) AS `numrows`
+FROM `airport_operations`.`db_airports`
+WHERE `origin_airport_id` = \'850a46d0-79c0-4db4-9241-51bdaea8f57d\'')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1744): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `airport_operations`.`db_airports`
+WHERE `origin_airport_id` = :origin_airport_id:', [...], false)
+ 5 APPPATH\Controllers\Api\ResourceController.php(396): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 6 APPPATH\Controllers\Api\ResourceController.php(234): App\Controllers\Api\ResourceController->payloadErrors([...])
+ 7 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Api\ResourceController->create()
+ 8 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Routes))
+ 9 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(Object(CodeIgniter\Router\RouteCollection), Object(Config\Cache), true)
+10 SYSTEMPATH\Test\FeatureTestTrait.php(235): CodeIgniter\CodeIgniter->run(Object(CodeIgniter\Router\RouteCollection), true)
+11 SYSTEMPATH\Test\FeatureTestTrait.php(271): Tests\Feature\ApiResourceTest->call('POST', '/api/flights/routes', null)
+12 ROOTPATH\tests\feature\ApiResourceTest.php(108): Tests\Feature\ApiResourceTest->post('/api/flights/routes')
+13 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(1548): Tests\Feature\ApiResourceTest->testCreateRejectsUnknownAirportReferenceWithoutDatabaseConnectionError()
+14 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(686): PHPUnit\Framework\TestCase->runTest()
+15 VENDORPATH\phpunit\phpunit\src\Framework\TestRunner.php(106): PHPUnit\Framework\TestCase->runBare()
+16 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(516): PHPUnit\Framework\TestRunner->run(Object(Tests\Feature\ApiResourceTest))
+17 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestCase->run()
+18 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+19 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+20 VENDORPATH\phpunit\phpunit\src\TextUI\TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+21 VENDORPATH\phpunit\phpunit\src\TextUI\Application.php(204): PHPUnit\TextUI\TestRunner->run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+22 VENDORPATH\phpunit\phpunit\phpunit(104): PHPUnit\TextUI\Application->run([...])
+23 VENDORPATH\bin\phpunit(122): include('D:\\Techx\\hert\\flight\\vendor\\phpunit\\phpunit\\phpunit')
+ERROR - 2026-10-14 16:42:22 --> Unable to prepare statement: no such table: airport_operations.db_flights
+in SYSTEMPATH\Database\SQLite3\Connection.php on line 159.
+ 1 SYSTEMPATH\Database\SQLite3\Connection.php(159): SQLite3->query('SELECT COUNT(*) AS `numrows`
+FROM `airport_operations`.`db_flights`
+WHERE `airline_id` = \'850a46d0-79c0-4db4-9241-51bdaea8f57d\'')
+ 2 SYSTEMPATH\Database\BaseConnection.php(905): CodeIgniter\Database\SQLite3\Connection->execute('SELECT COUNT(*) AS `numrows`
+FROM `airport_operations`.`db_flights`
+WHERE `airline_id` = \'850a46d0-79c0-4db4-9241-51bdaea8f57d\'')
+ 3 SYSTEMPATH\Database\BaseConnection.php(822): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*) AS `numrows`
+FROM `airport_operations`.`db_flights`
+WHERE `airline_id` = \'850a46d0-79c0-4db4-9241-51bdaea8f57d\'')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1744): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `airport_operations`.`db_flights`
+WHERE `airline_id` = :airline_id:', [...], false)
+ 5 APPPATH\Controllers\Api\ResourceController.php(203): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 6 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Api\ResourceController->delete('850a46d0-79c0-4db4-9241-51bdaea8f57d')
+ 7 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Airlines))
+ 8 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(Object(CodeIgniter\Router\RouteCollection), Object(Config\Cache), true)
+ 9 SYSTEMPATH\Test\FeatureTestTrait.php(235): CodeIgniter\CodeIgniter->run(Object(CodeIgniter\Router\RouteCollection), true)
+10 SYSTEMPATH\Test\FeatureTestTrait.php(316): Tests\Feature\ApiResourceTest->call('DELETE', '/api/flights/airlines/850a46d0-79c0-4db4-9241-51bdaea8f57d', null)
+11 ROOTPATH\tests\feature\ApiResourceTest.php(308): Tests\Feature\ApiResourceTest->delete('/api/flights/airlines/850a46d0-79c0-4db4-9241-51bdaea8f57d')
+12 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(1548): Tests\Feature\ApiResourceTest->testDeleteUsesNumericSuccessEnvelopeAndConfirmsDeletedId()
+13 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(686): PHPUnit\Framework\TestCase->runTest()
+14 VENDORPATH\phpunit\phpunit\src\Framework\TestRunner.php(106): PHPUnit\Framework\TestCase->runBare()
+15 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(516): PHPUnit\Framework\TestRunner->run(Object(Tests\Feature\ApiResourceTest))
+16 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestCase->run()
+17 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+18 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+19 VENDORPATH\phpunit\phpunit\src\TextUI\TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+20 VENDORPATH\phpunit\phpunit\src\TextUI\Application.php(204): PHPUnit\TextUI\TestRunner->run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+21 VENDORPATH\phpunit\phpunit\phpunit(104): PHPUnit\TextUI\Application->run([...])
+22 VENDORPATH\bin\phpunit(122): include('D:\\Techx\\hert\\flight\\vendor\\phpunit\\phpunit\\phpunit')
+ERROR - 2026-10-14 16:42:40 --> Unable to prepare statement: no such table: airport_operations.db_flights
+in SYSTEMPATH\Database\SQLite3\Connection.php on line 159.
+ 1 SYSTEMPATH\Database\SQLite3\Connection.php(159): SQLite3->query('SELECT COUNT(*) AS `numrows`
+FROM `airport_operations`.`db_flights`
+WHERE `airline_id` = \'850a46d0-79c0-4db4-9241-51bdaea8f57d\'')
+ 2 SYSTEMPATH\Database\BaseConnection.php(905): CodeIgniter\Database\SQLite3\Connection->execute('SELECT COUNT(*) AS `numrows`
+FROM `airport_operations`.`db_flights`
+WHERE `airline_id` = \'850a46d0-79c0-4db4-9241-51bdaea8f57d\'')
+ 3 SYSTEMPATH\Database\BaseConnection.php(822): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*) AS `numrows`
+FROM `airport_operations`.`db_flights`
+WHERE `airline_id` = \'850a46d0-79c0-4db4-9241-51bdaea8f57d\'')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1744): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `airport_operations`.`db_flights`
+WHERE `airline_id` = :airline_id:', [...], false)
+ 5 APPPATH\Controllers\Api\ResourceController.php(203): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 6 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Api\ResourceController->delete('850a46d0-79c0-4db4-9241-51bdaea8f57d')
+ 7 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Airlines))
+ 8 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(Object(CodeIgniter\Router\RouteCollection), Object(Config\Cache), true)
+ 9 SYSTEMPATH\Test\FeatureTestTrait.php(235): CodeIgniter\CodeIgniter->run(Object(CodeIgniter\Router\RouteCollection), true)
+10 SYSTEMPATH\Test\FeatureTestTrait.php(316): Tests\Feature\ApiResourceTest->call('DELETE', '/api/flights/airlines/850a46d0-79c0-4db4-9241-51bdaea8f57d', null)
+11 ROOTPATH\tests\feature\ApiResourceTest.php(311): Tests\Feature\ApiResourceTest->delete('/api/flights/airlines/850a46d0-79c0-4db4-9241-51bdaea8f57d')
+12 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(1548): Tests\Feature\ApiResourceTest->testDeleteUsesNumericSuccessEnvelopeAndConfirmsDeletedId()
+13 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(686): PHPUnit\Framework\TestCase->runTest()
+14 VENDORPATH\phpunit\phpunit\src\Framework\TestRunner.php(106): PHPUnit\Framework\TestCase->runBare()
+15 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(516): PHPUnit\Framework\TestRunner->run(Object(Tests\Feature\ApiResourceTest))
+16 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestCase->run()
+17 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+18 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+19 VENDORPATH\phpunit\phpunit\src\TextUI\TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+20 VENDORPATH\phpunit\phpunit\src\TextUI\Application.php(204): PHPUnit\TextUI\TestRunner->run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+21 VENDORPATH\phpunit\phpunit\phpunit(104): PHPUnit\TextUI\Application->run([...])
+22 VENDORPATH\bin\phpunit(122): include('D:\\Techx\\hert\\flight\\vendor\\phpunit\\phpunit\\phpunit')
+WARNING - 2026-10-14 16:43:56 --> [DEPRECATED] json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in APPPATH\Controllers\Api\ResourceController.php on line 259.
+ 1 APPPATH\Controllers\Api\ResourceController.php(259): json_decode(null, false, 512, 4194304)
+ 2 APPPATH\Controllers\Api\ResourceController.php(228): App\Controllers\Api\ResourceController->jsonPayload()
+ 3 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Api\ResourceController->create()
+ 4 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Airlines))
+ 5 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(Object(CodeIgniter\Router\RouteCollection), Object(Config\Cache), true)
+ 6 SYSTEMPATH\Test\FeatureTestTrait.php(235): CodeIgniter\CodeIgniter->run(Object(CodeIgniter\Router\RouteCollection), true)
+ 7 SYSTEMPATH\Test\FeatureTestTrait.php(271): Tests\Feature\ApiResourceTest->call('POST', '/api/flights/airlines', null)
+ 8 ROOTPATH\tests\feature\ApiResourceTest.php(28): Tests\Feature\ApiResourceTest->post('/api/flights/airlines')
+ 9 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(1548): Tests\Feature\ApiResourceTest->testCreateRejectsEmptyBody()
+10 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(686): PHPUnit\Framework\TestCase->runTest()
+11 VENDORPATH\phpunit\phpunit\src\Framework\TestRunner.php(106): PHPUnit\Framework\TestCase->runBare()
+12 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(516): PHPUnit\Framework\TestRunner->run(Object(Tests\Feature\ApiResourceTest))
+13 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestCase->run()
+14 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+15 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+16 VENDORPATH\phpunit\phpunit\src\TextUI\TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+17 VENDORPATH\phpunit\phpunit\src\TextUI\Application.php(204): PHPUnit\TextUI\TestRunner->run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+18 VENDORPATH\phpunit\phpunit\phpunit(104): PHPUnit\TextUI\Application->run([...])
+19 VENDORPATH\bin\phpunit(122): include('D:\\Techx\\hert\\flight\\vendor\\phpunit\\phpunit\\phpunit')
+WARNING - 2026-10-14 16:53:58 --> [DEPRECATED] json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in APPPATH\Controllers\Api\ResourceController.php on line 259.
+ 1 APPPATH\Controllers\Api\ResourceController.php(259): json_decode(null, false, 512, 4194304)
+ 2 APPPATH\Controllers\Api\ResourceController.php(228): App\Controllers\Api\ResourceController->jsonPayload()
+ 3 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Api\ResourceController->create()
+ 4 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Airlines))
+ 5 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 9 SYSTEMPATH\rewrite.php(44): require_once('D:\\Techx\\hert\\flight\\public\\index.php')
+WARNING - 2026-10-14 17:04:29 --> [DEPRECATED] json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in APPPATH\Controllers\Api\ResourceController.php on line 259.
+ 1 APPPATH\Controllers\Api\ResourceController.php(259): json_decode(null, false, 512, 4194304)
+ 2 APPPATH\Controllers\Api\ResourceController.php(228): App\Controllers\Api\ResourceController->jsonPayload()
+ 3 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Api\ResourceController->create()
+ 4 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Airlines))
+ 5 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 9 SYSTEMPATH\rewrite.php(44): require_once('D:\\Techx\\hert\\flight\\public\\index.php')
+WARNING - 2026-10-14 17:07:39 --> [DEPRECATED] json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in APPPATH\Controllers\Api\ResourceController.php on line 259.
+ 1 APPPATH\Controllers\Api\ResourceController.php(259): json_decode(null, false, 512, 4194304)
+ 2 APPPATH\Controllers\Api\ResourceController.php(228): App\Controllers\Api\ResourceController->jsonPayload()
+ 3 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Api\ResourceController->create()
+ 4 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Airlines))
+ 5 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(Object(CodeIgniter\Router\RouteCollection), Object(Config\Cache), true)
+ 6 SYSTEMPATH\Test\FeatureTestTrait.php(235): CodeIgniter\CodeIgniter->run(Object(CodeIgniter\Router\RouteCollection), true)
+ 7 SYSTEMPATH\Test\FeatureTestTrait.php(271): Tests\Feature\ApiResourceTest->call('POST', '/api/flights/airlines', null)
+ 8 ROOTPATH\tests\feature\ApiResourceTest.php(28): Tests\Feature\ApiResourceTest->post('/api/flights/airlines')
+ 9 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(1548): Tests\Feature\ApiResourceTest->testCreateRejectsEmptyBody()
+10 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(686): PHPUnit\Framework\TestCase->runTest()
+11 VENDORPATH\phpunit\phpunit\src\Framework\TestRunner.php(106): PHPUnit\Framework\TestCase->runBare()
+12 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(516): PHPUnit\Framework\TestRunner->run(Object(Tests\Feature\ApiResourceTest))
+13 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestCase->run()
+14 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+15 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+16 VENDORPATH\phpunit\phpunit\src\TextUI\TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+17 VENDORPATH\phpunit\phpunit\src\TextUI\Application.php(204): PHPUnit\TextUI\TestRunner->run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+18 VENDORPATH\phpunit\phpunit\phpunit(104): PHPUnit\TextUI\Application->run([...])
+19 VENDORPATH\bin\phpunit(122): include('D:\\Techx\\hert\\flight\\vendor\\phpunit\\phpunit\\phpunit')
+WARNING - 2026-10-14 17:07:49 --> [DEPRECATED] json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in APPPATH\Controllers\Api\ResourceController.php on line 259.
+ 1 APPPATH\Controllers\Api\ResourceController.php(259): json_decode(null, false, 512, 4194304)
+ 2 APPPATH\Controllers\Api\ResourceController.php(228): App\Controllers\Api\ResourceController->jsonPayload()
+ 3 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Api\ResourceController->create()
+ 4 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Airlines))
+ 5 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(Object(CodeIgniter\Router\RouteCollection), Object(Config\Cache), true)
+ 6 SYSTEMPATH\Test\FeatureTestTrait.php(235): CodeIgniter\CodeIgniter->run(Object(CodeIgniter\Router\RouteCollection), true)
+ 7 SYSTEMPATH\Test\FeatureTestTrait.php(271): Tests\Feature\ApiResourceTest->call('POST', '/api/flights/airlines', null)
+ 8 ROOTPATH\tests\feature\ApiResourceTest.php(28): Tests\Feature\ApiResourceTest->post('/api/flights/airlines')
+ 9 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(1548): Tests\Feature\ApiResourceTest->testCreateRejectsEmptyBody()
+10 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(686): PHPUnit\Framework\TestCase->runTest()
+11 VENDORPATH\phpunit\phpunit\src\Framework\TestRunner.php(106): PHPUnit\Framework\TestCase->runBare()
+12 VENDORPATH\phpunit\phpunit\src\Framework\TestCase.php(516): PHPUnit\Framework\TestRunner->run(Object(Tests\Feature\ApiResourceTest))
+13 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestCase->run()
+14 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+15 VENDORPATH\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+16 VENDORPATH\phpunit\phpunit\src\TextUI\TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+17 VENDORPATH\phpunit\phpunit\src\TextUI\Application.php(204): PHPUnit\TextUI\TestRunner->run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+18 VENDORPATH\phpunit\phpunit\phpunit(104): PHPUnit\TextUI\Application->run([...])
+19 VENDORPATH\bin\phpunit(122): include('D:\\Techx\\hert\\flight\\vendor\\phpunit\\phpunit\\phpunit')
+WARNING - 2026-10-14 17:16:53 --> [DEPRECATED] json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in APPPATH\Controllers\Api\ResourceController.php on line 259.
+ 1 APPPATH\Controllers\Api\ResourceController.php(259): json_decode(null, false, 512, 4194304)
+ 2 APPPATH\Controllers\Api\ResourceController.php(228): App\Controllers\Api\ResourceController->jsonPayload()
+ 3 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Api\ResourceController->create()
+ 4 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Api\Airlines))
+ 5 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 6 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 7 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 8 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 9 SYSTEMPATH\rewrite.php(44): require_once('D:\\Techx\\hert\\flight\\public\\index.php')

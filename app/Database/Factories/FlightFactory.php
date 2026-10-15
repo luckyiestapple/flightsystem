@@ -17,6 +17,8 @@ final class FlightFactory
             'flight_number' => strtoupper($faker->randomElement(['GA', 'QZ', 'JT', 'ID', 'SQ'])) . $faker->numberBetween(100, 9999),
             'airline_id' => $airlineId,
             'aircraft_id' => self::uuid(),
+            'place_id' => null,
+            'pilot_id' => null,
             'route_id' => $routeId,
             'departure_gate_id' => null,
             'arrival_gate_id' => null,

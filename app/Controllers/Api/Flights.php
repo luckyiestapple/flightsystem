@@ -12,6 +12,8 @@ final class Flights extends ResourceController
         'flight_number',
         'airline_id',
         'aircraft_id',
+        'place_id',
+        'pilot_id',
         'route_id',
         'departure_gate_id',
         'arrival_gate_id',
@@ -40,6 +42,8 @@ final class Flights extends ResourceController
     ];
     protected array $nullableFields = [
         'aircraft_id',
+        'place_id',
+        'pilot_id',
         'departure_gate_id',
         'arrival_gate_id',
         'estimated_departure',
@@ -52,6 +56,8 @@ final class Flights extends ResourceController
         'flight_number',
         'airline_id',
         'aircraft_id',
+        'place_id',
+        'pilot_id',
         'route_id',
         'departure_gate_id',
         'arrival_gate_id',
@@ -74,6 +80,8 @@ final class Flights extends ResourceController
     protected array $validationRules = [
         'flight_number' => 'max_length[20]',
         'aircraft_id' => 'regex_match[/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/]',
+        'place_id' => 'regex_match[/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/]',
+        'pilot_id' => 'regex_match[/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/]',
         'departure_gate_id' => 'regex_match[/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/]',
         'arrival_gate_id' => 'regex_match[/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/]',
         'scheduled_departure' => 'valid_date[Y-m-d H:i:s]',

@@ -2,6 +2,8 @@
 
 Dokumentasi ini menjelaskan API CRUD JSON untuk seluruh tabel pada migration
 `CreateAirportOperations`: `airlines`, `airports`, `routes`, dan `flights`.
+Migration `AddPlaceAndPilotToFlights` menambahkan referensi UUID eksternal
+`place_id` dan `pilot_id` ke tabel flights.
 Semua endpoint menggunakan prefix `/api/flights`.
 
 ## Persiapan
@@ -195,6 +197,8 @@ Tabel `airport_operations.flights`.
 | `flight_number` | string, maks. 20 | wajib | Nomor penerbangan |
 | `airline_id` | UUID, FK ke airline | wajib | Harus menunjuk maskapai yang ada |
 | `aircraft_id` | UUID/null | opsional | Tidak mempunyai tabel/FK pada migration saat ini |
+| `place_id` | UUID/null | opsional | ID dari API/database eksternal; tidak memiliki FK lokal |
+| `pilot_id` | UUID/null | opsional | ID dari API/database eksternal; tidak memiliki FK lokal |
 | `route_id` | UUID, FK ke route | wajib | Harus menunjuk rute yang ada |
 | `departure_gate_id` | UUID/null | opsional | Tidak mempunyai tabel/FK pada migration saat ini |
 | `arrival_gate_id` | UUID/null | opsional | Tidak mempunyai tabel/FK pada migration saat ini |
@@ -216,6 +220,8 @@ Contoh:
 {
   "flight_number": "GA204",
   "airline_id": "4d206f9c-257d-4db2-a5ca-67a337a7cc1b",
+  "place_id": "a0cf207d-305b-4b83-a634-a5a4426d403f",
+  "pilot_id": "b5e8241f-1b99-4c59-bde7-d952b110e561",
   "route_id": "c974888f-ec55-46a8-885e-2d790a1868b6",
   "scheduled_departure": "2026-11-10 08:00:00",
   "scheduled_arrival": "2026-11-10 10:00:00",
@@ -321,7 +327,7 @@ Kolom `q` dan filter per resource:
 | `airlines` | `airline_code`, `airline_name`, `country`, `contact` | `airline_code`, `airline_name`, `country`, `status` |
 | `airports` | `airport_code`, `airport_name`, `city`, `country`, `timezone` | `airport_code`, `city`, `country`, `timezone`, `status` |
 | `routes` | Tidak tersedia; gunakan filter exact | `origin_airport_id`, `destination_airport_id`, `distance_km`, `estimated_duration_minutes` |
-| `flights` | `flight_number`, `flight_status` | `flight_number`, `airline_id`, `aircraft_id`, `route_id`, `departure_gate_id`, `arrival_gate_id`, `flight_status`, `scheduled_departure`, `estimated_departure`, `actual_departure`, `scheduled_arrival`, `estimated_arrival`, `actual_arrival` |
+| `flights` | `flight_number`, `flight_status` | `flight_number`, `airline_id`, `aircraft_id`, `place_id`, `pilot_id`, `route_id`, `departure_gate_id`, `arrival_gate_id`, `flight_status`, `scheduled_departure`, `estimated_departure`, `actual_departure`, `scheduled_arrival`, `estimated_arrival`, `actual_arrival` |
 
 Contoh mencari flight maskapai tertentu:
 
