@@ -2,9 +2,12 @@
 
 Dokumentasi ini menjelaskan API CRUD JSON untuk seluruh tabel pada migration
 `CreateAirportOperations`: `airlines`, `airports`, `routes`, dan `flights`.
-Migration `AddPlaceAndPilotToFlights` menambahkan referensi UUID eksternal
-`place_id` dan `pilot_id` ke tabel flights.
-Semua endpoint menggunakan prefix `/api/flights`.
+Migration `AddPlaceAndPilotToFlights` menambahkan referensi eksternal
+`place_id` dan `pilot_id` ke tabel flights. Migration
+`ChangeExternalReferenceIdsToText` menyimpan referensi tersebut sebagai teks
+agar bisa mengikuti format ID dari project Place dan Pilot.
+Endpoint resource lokal menggunakan prefix `/api`. Endpoint Place dan
+Pilot merupakan proxy GET ke project API eksternal.
 
 ## Persiapan
 
@@ -14,16 +17,34 @@ environment. CI4 memuat `.env` seperti biasa; jika `.env` tidak ada, konfigurasi
 database proyek ini memuat file `env`:
 
 ```ini
+app.baseURL = 'http://localhost:8080/'
 database.default.hostname = localhost
 database.default.database = nama_database
 database.default.username = nama_user
 database.default.password = kata_sandi
 database.default.DBDriver = Postgre
 database.default.port = 5432
+
+# Isi URL root dari project API terpisah, tanpa suffix /api.
+api.place = http://IP-PLACE:PORT
+api.pilot = http://IP-PILOT:PORT
 ```
 
-Driver default adalah `Postgre` dan port default `5432`. Isi nilai koneksi sesuai
-server PostgreSQL Anda sebelum menjalankan:
+`app.baseURL` adalah alamat aplikasi Flight, dan harus diakhiri `/`.
+`database.default.*` mengatur koneksi PostgreSQL. `api.place` dan `api.pilot`
+adalah URL root dari project eksternal (tanpa suffix `/api`), misalnya:
+
+```ini
+app.baseURL = 'http://192.168.1.10:8080/'
+api.place = http://192.168.1.20:8081
+api.pilot = http://192.168.1.21:8082
+```
+
+Sesuaikan host dan port dengan alamat yang dapat dijangkau dari mesin Flight.
+Letakkan konfigurasi lokal di `.env`; `env` hanya template. `.env` tidak
+dimasukkan ke Git. Restart server Flight setelah mengubah `.env`.
+
+Setelah database dan URL API diatur, jalankan:
 
 ```sh
 php spark migrate
@@ -45,31 +66,82 @@ sebelum mengekspos endpoint ke jaringan publik.
 Panduan dan berkas uji coba yang dapat langsung dipakai:
 
 - [Contoh cURL untuk PowerShell](./curl.md)
-- [Koleksi Postman v2.1](./postman_collection.json) — impor JSON ini ke Postman,
-  lalu kirim request secara manual. Koleksi tidak memakai variables atau scripts.
+- [Koleksi Postman v2.1](./postman_collection.json)
+- [Environment Postman](./postman_environment.json)
 
-Koleksi Postman memakai URL localhost dan nilai contoh statis. Ganti
-`REPLACE_WITH_AIRLINE_ID` dengan `airline_id` yang dikembalikan POST sebelum
-mencoba detail, update, atau delete. Jalankan terhadap database uji/lokal:
-request delete menghapus record secara permanen.
+Panduan cURL mencakup alur CRUD untuk `airlines`, `airports`, `routes`, dan
+`flights`, termasuk urutan pembuatan dan penghapusan record yang saling
+mereferensikan.
 
-## Daftar endpoint
+Impor koleksi dan environment ke Postman, pilih environment **Flight Local**,
+lalu atur nilai `base_url` di environment tersebut ke nilai `app.baseURL` dari
+`.env` (hilangkan trailing `/` pada nilai Postman). `base_url` Postman adalah
+konfigurasi client terpisah; Postman tidak membaca file `.env` PHP secara
+langsung. Ganti `REPLACE_WITH_AIRLINE_ID`, `REPLACE_WITH_PLACE_ID`, dan
+`REPLACE_WITH_PILOT_ID` dengan ID yang sesuai sebelum menjalankan request
+detail. Request delete menghapus record secara permanen.
+
+## Daftar endpoint resource lokal
 
 `{resource}` adalah salah satu dari `airlines`, `airports`, `routes`, atau
 `flights`. `{id}` adalah UUID record.
 
 | Method | Endpoint | Kegunaan |
 | --- | --- | --- |
-| `POST` | `/api/flights/{resource}` | Membuat record |
-| `GET` | `/api/flights/{resource}` | Mengambil seluruh data |
-| `GET` | `/api/flights/search/{resource}` | Mencari, memfilter, dan mengurutkan data |
-| `GET` | `/api/flights/{resource}/{id}` | Mengambil detail satu record |
-| `PUT` | `/api/flights/{resource}/{id}` | Mengganti data record |
-| `PATCH` | `/api/flights/{resource}/{id}` | Mengubah sebagian field |
-| `DELETE` | `/api/flights/{resource}/{id}` | Menghapus record |
+| `POST` | `/api/{resource}` | Membuat record |
+| `GET` | `/api/{resource}` | Mengambil seluruh data |
+| `GET` | `/api/search/{resource}` | Mencari, memfilter, dan mengurutkan data |
+| `GET` | `/api/{resource}/{id}` | Mengambil detail satu record |
+| `PUT` | `/api/{resource}/{id}` | Mengganti data record |
+| `PATCH` | `/api/{resource}/{id}` | Mengubah sebagian field |
+| `DELETE` | `/api/{resource}/{id}` | Menghapus record |
+| `GET` | `/api/place/` | Proxy daftar Place dari project Place |
+| `GET` | `/api/places/{id}` | Proxy detail Place dari project Place |
+| `GET` | `/api/pilot` | Proxy daftar Pilot dari project Pilot |
+| `GET` | `/api/pilot/{id}` | Proxy detail Pilot dari project Pilot |
 
 Collection `GET` juga menerima query pencarian, filter, dan sorting yang sama
-dengan endpoint `/api/flights/search/{resource}`.
+dengan endpoint `/api/search/{resource}`.
+
+## Integrasi API Place dan Pilot
+
+Endpoint Place dan Pilot di atas meneruskan GET ke project API yang terpisah.
+Daftar Place diteruskan ke `{api.place}/api/place/`, detail Place ke
+`{api.place}/api/places/{id}`, daftar Pilot ke `{api.pilot}/api/pilot`, dan
+detail Pilot ke `{api.pilot}/api/pilot/{id}`. Respons JSON dan status HTTP dari
+API asal diteruskan apa adanya. ID pada URL di-encode sebelum dikirim ke
+project asal.
+
+Untuk input flight, kirim `place_id` dan `pilot_id` yang dipilih dari hasil
+endpoint daftar. ID disimpan di tabel flights. Saat membaca collection atau
+detail flight, API juga mengambil detail Place/Pilot dari project masing-masing
+dan menyertakannya di property `place` dan `pilot`, tanpa menghapus ID aslinya:
+
+```json
+{
+  "flight_id": "uuid-flight",
+  "place_id": "GATE-A12",
+  "place": {
+    "id": "GATE-A12",
+    "name": "Gate A"
+  },
+  "pilot_id": "PILOT-17",
+  "pilot": {
+    "id": "PILOT-17",
+    "name": "Pilot"
+  }
+}
+```
+
+Jika API asal membungkus object di dalam envelope `data` (dan envelope itu
+memiliki field `status`), nilai `data` yang disertakan sebagai detail. Jika ID
+flight bernilai `null`, property detail terkait juga `null`. Jika URL belum
+diatur, API mengembalikan `503`; jika project asal tidak bisa dihubungi,
+mengembalikan `502`. Kegagalan mengambil detail ketika membaca flight
+mengembalikan error, bukan respons sukses yang detailnya diam-diam dikosongkan.
+Collection flights yang memiliki referensi Place/Pilot akan melakukan request
+detail untuk setiap ID unik yang ditemukan; pertimbangkan jumlah data dan
+ketersediaan kedua service.
 
 ## Bentuk respons
 
@@ -135,7 +207,7 @@ Tabel `airport_operations.airlines`.
 Contoh:
 
 ```http
-POST /api/flights/airlines
+POST /api/airlines
 ```
 
 ```json
@@ -197,8 +269,8 @@ Tabel `airport_operations.flights`.
 | `flight_number` | string, maks. 20 | wajib | Nomor penerbangan |
 | `airline_id` | UUID, FK ke airline | wajib | Harus menunjuk maskapai yang ada |
 | `aircraft_id` | UUID/null | opsional | Tidak mempunyai tabel/FK pada migration saat ini |
-| `place_id` | UUID/null | opsional | ID dari API/database eksternal; tidak memiliki FK lokal |
-| `pilot_id` | UUID/null | opsional | ID dari API/database eksternal; tidak memiliki FK lokal |
+| `place_id` | string/null, maks. 255 karakter | opsional | ID dari API eksternal, misalnya `GATE-A12` atau `73002`; tidak memiliki FK lokal |
+| `pilot_id` | string/null, maks. 255 karakter | opsional | ID dari API eksternal, misalnya `PILOT-17` atau `73002`; tidak memiliki FK lokal |
 | `route_id` | UUID, FK ke route | wajib | Harus menunjuk rute yang ada |
 | `departure_gate_id` | UUID/null | opsional | Tidak mempunyai tabel/FK pada migration saat ini |
 | `arrival_gate_id` | UUID/null | opsional | Tidak mempunyai tabel/FK pada migration saat ini |
@@ -232,7 +304,7 @@ Contoh:
 ## Membaca seluruh data
 
 ```http
-GET /api/flights/flights
+GET /api/flights
 ```
 
 Collection mengembalikan semua record tanpa pagination atau metadata tambahan.
@@ -241,7 +313,7 @@ Parameter `page` dan `per_page` tidak digunakan.
 Detail:
 
 ```http
-GET /api/flights/flights/c974888f-ec55-46a8-885e-2d790a1868b6
+GET /api/flights/c974888f-ec55-46a8-885e-2d790a1868b6
 ```
 
 ## Edit data
@@ -258,7 +330,7 @@ spasi) ditolak dengan HTTP `400`. Untuk mengosongkan field nullable kirim
 ditolak.
 
 ```http
-PUT /api/flights/airlines/{airline_id}
+PUT /api/airlines/{airline_id}
 ```
 
 ```json
@@ -279,7 +351,7 @@ hanya berisi spasi ditolak dengan HTTP `400`. `null` ditolak untuk field
 non-nullable.
 
 ```http
-PATCH /api/flights/airlines/{airline_id}
+PATCH /api/airlines/{airline_id}
 ```
 
 ```json
@@ -291,7 +363,7 @@ PATCH /api/flights/airlines/{airline_id}
 ## Hapus data
 
 ```http
-DELETE /api/flights/airlines/{airline_id}
+DELETE /api/airlines/{airline_id}
 ```
 
 Airport yang dipakai route, airline yang dipakai flight, dan route yang dipakai
@@ -311,10 +383,10 @@ mengembalikan:
 
 Pencarian teks dilakukan case-insensitive pada kolom teks yang didukung. Filter
 bersifat exact-match; beberapa filter sekaligus digabungkan dengan kondisi AND.
-Gunakan `/api/flights/search/{resource}` atau collection endpoint.
+Gunakan `/api/search/{resource}` atau collection endpoint.
 
 ```http
-GET /api/flights/search/airports?q=jakarta&filter[status]=ACTIVE&sort=airport_name&order=ASC
+GET /api/search/airports?q=jakarta&filter[status]=ACTIVE&sort=airport_name&order=ASC
 ```
 
 Untuk URL yang mengharuskan encoding bracket, gunakan
@@ -332,7 +404,7 @@ Kolom `q` dan filter per resource:
 Contoh mencari flight maskapai tertentu:
 
 ```http
-GET /api/flights/search/flights?filter[airline_id]=4d206f9c-257d-4db2-a5ca-67a337a7cc1b&filter[flight_status]=SCHEDULED
+GET /api/search/flights?filter[airline_id]=4d206f9c-257d-4db2-a5ca-67a337a7cc1b&filter[flight_status]=SCHEDULED
 ```
 
 Sorting menggunakan `sort` dan `order` (`ASC` atau `DESC`). Hanya kolom berikut

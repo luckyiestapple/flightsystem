@@ -199,4 +199,11 @@ class App extends BaseConfig
      * @see http://www.w3.org/TR/CSP/
      */
     public bool $CSPEnabled = false;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->baseURL = (string) env('app.baseURL', 'http://localhost:8080/');
+    }
 }

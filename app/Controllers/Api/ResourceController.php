@@ -98,6 +98,11 @@ abstract class ResourceController extends BaseController
         $order = strtoupper($order);
         $builder->orderBy($sort ?? $this->primaryKey, $order);
         $records = $builder->get()->getResultArray();
+        $records = $this->presentRecords($records);
+
+        if ($records instanceof ResponseInterface) {
+            return $records;
+        }
 
         return $this->successResponse($records, 200, 'Data berhasil diambil.');
     }
@@ -112,6 +117,12 @@ abstract class ResourceController extends BaseController
 
         if ($record === null) {
             return $this->errorResponse('Data tidak ditemukan.', 404);
+        }
+
+        $record = $this->presentRecord($record);
+
+        if ($record instanceof ResponseInterface) {
+            return $record;
         }
 
         return $this->successResponse($record, 200, 'Data berhasil diambil.');
@@ -255,8 +266,14 @@ abstract class ResourceController extends BaseController
 
     protected function jsonPayload(): array|ResponseInterface
     {
+        $body = $this->request->getBody();
+
+        if (! is_string($body) || $body === '') {
+            return $this->errorResponse('Body harus berupa JSON yang valid.', 400);
+        }
+
         try {
-            $payload = json_decode($this->request->getBody(), false, 512, JSON_THROW_ON_ERROR);
+            $payload = json_decode($body, false, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException) {
             return $this->errorResponse('Body harus berupa JSON yang valid.', 400);
         }
@@ -398,6 +415,26 @@ abstract class ResourceController extends BaseController
     protected function recordErrors(array $payload): array
     {
         return [];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $records
+     *
+     * @return list<array<string, mixed>>|ResponseInterface
+     */
+    protected function presentRecords(array $records): array|ResponseInterface
+    {
+        return $records;
+    }
+
+    /**
+     * @param array<string, mixed> $record
+     *
+     * @return array<string, mixed>|ResponseInterface
+     */
+    protected function presentRecord(array $record): array|ResponseInterface
+    {
+        return $record;
     }
 
     protected function uuid(): string

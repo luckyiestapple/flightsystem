@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "bd5eaf6f-e472-43f7-9f21-e0e74a4d70b8",
     "name": "Flight API - CRUD Manual Tests",
-    "description": "Request manual untuk CRUD airlines. Tidak memakai variables, pre-request scripts, atau test scripts. Ganti teks REPLACE_WITH_AIRLINE_ID dengan airline_id dari respons POST yang ingin diuji. Untuk skenario duplikat, pastikan kode GA sudah ada di database. Base URL contoh: http://localhost:8081.",
+    "description": "Manual requests for the Flight API. Import the Flight Local environment and set base_url to app.baseURL from the PHP .env file (without the trailing slash). Set place_id, pilot_id, and record IDs before using detail requests. DELETE requests permanently remove local records.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -16,7 +16,7 @@
             "value": "application/json"
           }
         ],
-        "url": "http://localhost:8081/api/flights/airlines"
+        "url": "{{base_url}}/api/airlines"
       }
     },
     {
@@ -29,7 +29,7 @@
             "value": "application/json"
           }
         ],
-        "url": "http://localhost:8081/api/flights/search/airlines?q=GA"
+        "url": "{{base_url}}/api/search/airlines?q=GA"
       }
     },
     {
@@ -42,7 +42,7 @@
             "value": "application/json"
           }
         ],
-        "url": "http://localhost:8081/api/flights/airlines/REPLACE_WITH_AIRLINE_ID"
+        "url": "{{base_url}}/api/airlines/{{airline_id}}"
       }
     },
     {
@@ -69,7 +69,7 @@
             }
           }
         },
-        "url": "http://localhost:8081/api/flights/airlines"
+        "url": "{{base_url}}/api/airlines"
       }
     },
     {
@@ -96,14 +96,14 @@
             }
           }
         },
-        "url": "http://localhost:8081/api/flights/airlines"
+        "url": "{{base_url}}/api/airlines"
       }
     },
     {
       "name": "6. PUT ubah seluruh data",
       "request": {
         "method": "PUT",
-        "description": "Ganti REPLACE_WITH_AIRLINE_ID dengan ID dari respons POST tambah data. Gunakan airline_code yang sama dengan record tersebut.",
+        "description": "Ganti {{airline_id}} dengan ID dari respons POST tambah data. Gunakan airline_code yang sama dengan record tersebut.",
         "header": [
           {
             "key": "Accept",
@@ -123,7 +123,7 @@
             }
           }
         },
-        "url": "http://localhost:8081/api/flights/airlines/REPLACE_WITH_AIRLINE_ID"
+        "url": "{{base_url}}/api/airlines/{{airline_id}}"
       }
     },
     {
@@ -149,7 +149,7 @@
             }
           }
         },
-        "url": "http://localhost:8081/api/flights/airlines/REPLACE_WITH_AIRLINE_ID"
+        "url": "{{base_url}}/api/airlines/{{airline_id}}"
       }
     },
     {
@@ -176,7 +176,7 @@
             }
           }
         },
-        "url": "http://localhost:8081/api/flights/airlines"
+        "url": "{{base_url}}/api/airlines"
       }
     },
     {
@@ -203,7 +203,7 @@
             }
           }
         },
-        "url": "http://localhost:8081/api/flights/airlines/REPLACE_WITH_FIXTURE_AIRLINE_ID"
+        "url": "{{base_url}}/api/airlines/REPLACE_WITH_FIXTURE_AIRLINE_ID"
       }
     },
     {
@@ -216,7 +216,7 @@
             "value": "application/json"
           }
         ],
-        "url": "http://localhost:8081/api/flights/airlines/REPLACE_WITH_FIXTURE_AIRLINE_ID"
+        "url": "{{base_url}}/api/airlines/REPLACE_WITH_FIXTURE_AIRLINE_ID"
       }
     },
     {
@@ -229,7 +229,7 @@
             "value": "application/json"
           }
         ],
-        "url": "http://localhost:8081/api/flights/airlines/REPLACE_WITH_AIRLINE_ID"
+        "url": "{{base_url}}/api/airlines/{{airline_id}}"
       }
     },
     {
@@ -242,7 +242,7 @@
             "value": "application/json"
           }
         ],
-        "url": "http://localhost:8081/api/flights/airlines/REPLACE_WITH_AIRLINE_ID"
+        "url": "{{base_url}}/api/airlines/{{airline_id}}"
       }
     },
     {
@@ -268,7 +268,7 @@
             }
           }
         },
-        "url": "http://localhost:8081/api/flights/airlines"
+        "url": "{{base_url}}/api/airlines"
       }
     },
     {
@@ -294,7 +294,7 @@
             }
           }
         },
-        "url": "http://localhost:8081/api/flights/airlines"
+        "url": "{{base_url}}/api/airlines"
       }
     },
     {
@@ -320,8 +320,103 @@
             }
           }
         },
-        "url": "http://localhost:8081/api/flights/airlines"
+        "url": "{{base_url}}/api/airlines"
       }
+    },
+    {
+      "name": "Place & Pilot API Proxy",
+      "item": [
+        {
+          "name": "GET semua Place",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/place/"
+          }
+        },
+        {
+          "name": "GET detail Place",
+          "request": {
+            "method": "GET",
+            "description": "Set the place_id environment variable to an ID returned by the Place API.",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/places/{{place_id}}"
+          }
+        },
+        {
+          "name": "GET semua Pilot",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/pilot"
+          }
+        },
+        {
+          "name": "GET detail Pilot",
+          "request": {
+            "method": "GET",
+            "description": "Set the pilot_id environment variable to an ID returned by the Pilot API.",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/pilot/{{pilot_id}}"
+          }
+        },
+        {
+          "name": "GET Flights dengan detail Place & Pilot",
+          "request": {
+            "method": "GET",
+            "description": "Each flight response includes Place and Pilot detail when the saved external IDs are present and the upstream APIs are configured in the Flight server .env.",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/api/flights"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "airline_id",
+      "value": "REPLACE_WITH_AIRLINE_ID",
+      "type": "string"
+    },
+    {
+      "key": "place_id",
+      "value": "REPLACE_WITH_PLACE_ID",
+      "type": "string"
+    },
+    {
+      "key": "pilot_id",
+      "value": "REPLACE_WITH_PILOT_ID",
+      "type": "string"
     }
   ]
 }

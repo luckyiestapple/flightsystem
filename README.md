@@ -1,69 +1,114 @@
-# CodeIgniter 4 Application Starter
+# Flight Operations API
 
-## What is CodeIgniter?
+REST API untuk mengelola maskapai, bandara, rute, dan penerbangan. Aplikasi
+dibangun dengan CodeIgniter 4 dan PostgreSQL. Data Place dan Pilot diambil dari
+dua project API terpisah melalui konfigurasi URL.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+## Persiapan lokal
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+Persyaratan: PHP 8.2+, Composer, PostgreSQL, dan ekstensi PHP yang dibutuhkan
+CodeIgniter 4 (`intl`, `mbstring`, `json`, dan `curl`).
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+1. Install dependency:
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+   ```powershell
+   composer install
+   ```
 
-## Installation & updates
+2. Salin `env` menjadi `.env` jika file `.env` belum tersedia.
+3. Atur `app.baseURL`, koneksi PostgreSQL, dan URL project Place/Pilot di `.env`:
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+   ```ini
+   app.baseURL = 'http://localhost:8080/'
+   database.default.hostname = localhost
+   database.default.database = flight_db
+   database.default.username = postgres
+   database.default.password = your_password
+   database.default.DBDriver = Postgre
+   database.default.port = 5432
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+   api.place = http://IP-PLACE:PORT
+   api.pilot = http://IP-PILOT:PORT
+   ```
 
-## Setup
+   `app.baseURL` adalah URL aplikasi Flight dan diakhiri `/`. URL Place dan
+   Pilot harus berupa alamat root yang dapat dijangkau dari mesin Flight,
+   tanpa suffix `/api`. Restart server setelah mengubah `.env`.
+4. Jalankan migration dan server:
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+   ```powershell
+   php spark migrate
+   php spark serve
+   ```
 
-## Important Change with index.php
+Server lokal tersedia di `http://localhost:8080`. Seeder hanya untuk mengisi
+data lokal/dev; periksa isi seed sebelum menjalankannya pada database lain:
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+```powershell
+php spark db:seed DatabaseSeeder
+```
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+## Endpoint utama
 
-**Please** read the user guide for a better explanation of how CI4 works!
+Resource lokal menggunakan prefix `/api`:
 
-## Repository Management
+| Resource | Collection | Detail |
+| --- | --- | --- |
+| Airlines | `/api/airlines` | `/api/airlines/{id}` |
+| Airports | `/api/airports` | `/api/airports/{id}` |
+| Routes | `/api/routes` | `/api/routes/{id}` |
+| Flights | `/api/flights` | `/api/flights/{id}` |
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+Resource lokal mendukung GET collection/detail, POST, PUT, PATCH, dan DELETE.
+Endpoint pencarian tersedia di `/api/search/{resource}`.
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+Endpoint Place dan Pilot meneruskan GET ke project terpisah:
 
-## Server Requirements
+| Data | Collection | Detail |
+| --- | --- | --- |
+| Place | `/api/place/` | `/api/places/{id}` |
+| Pilot | `/api/pilot` | `/api/pilot/{id}` |
 
-PHP version 8.2 or higher is required, with the following extensions installed:
+`place_id` dan `pilot_id` pada flight menyimpan ID dari API eksternal. Ketika
+membaca flight, respons juga memuat detail terkait pada property `place` dan
+`pilot`.
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+## Struktur project
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - The end of life date for PHP 8.1 was December 31, 2025.
-> - If you are still using below PHP 8.2, you should upgrade immediately.
-> - The end of life date for PHP 8.2 will be December 31, 2026.
+```text
+app/
+  Config/          Konfigurasi aplikasi, route, database, API eksternal
+  Controllers/     Handler HTTP dan endpoint API
+  Database/        Migration, seeder, dan factory
+  Libraries/       Klien HTTP API Place/Pilot dan error integrasi
+  Models/          Akses tabel database
+  Views/           Halaman web CodeIgniter
+docs/              Referensi API, contoh cURL, koleksi Postman
+tests/
+  feature/         Pengujian endpoint dan alur API
+public/            Document root web server
+```
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+Struktur `app/` mengikuti konvensi CodeIgniter agar route, autoload, migration,
+dan konfigurasi mudah ditemukan. File framework berada di `vendor/`; jangan
+mengeditnya untuk mengubah perilaku aplikasi.
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+## Dokumentasi dan verifikasi
+
+- [Dokumentasi API dan schema](docs/README.md)
+- [Contoh request cURL untuk PowerShell](docs/curl.md)
+- [Koleksi Postman](docs/postman_collection.json)
+- [Environment Postman](docs/postman_environment.json)
+
+Di Postman, impor koleksi dan environment, lalu samakan variabel `base_url`
+dengan `app.baseURL` pada `.env` (tanpa trailing `/`). Postman tidak membaca
+file `.env` aplikasi secara otomatis.
+
+Jalankan seluruh test:
+
+```powershell
+php vendor\bin\phpunit --no-coverage
+```
+
+API belum memiliki autentikasi/otorisasi. Gunakan di lingkungan lokal atau
+jaringan tepercaya sampai proteksi akses ditambahkan.

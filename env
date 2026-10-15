@@ -1,8 +1,17 @@
 CI_ENVIRONMENT = development
 
+# Base URL aplikasi Flight; sesuaikan host/port jika diakses dari perangkat lain.
+app.baseURL = 'http://localhost:8080/'
+
 database.default.hostname = localhost
 database.default.database = 
 database.default.username = postgres
 database.default.password = 
 database.default.DBDriver = Postgre
 database.default.port = 5432
+
+# Root URL host for each separate API project; do not include the /api path.
+# Example: http://192.168.1.20:8081
+api.place =
+# Example: http://192.168.1.21:8082
+api.pilot =

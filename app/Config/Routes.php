@@ -5,7 +5,12 @@ use CodeIgniter\Router\RouteCollection;
 /** @var RouteCollection $routes */
 $routes->get('/', 'Home::index');
 
-$routes->group('api/flights', static function (RouteCollection $routes): void {
+$routes->get('api/place', 'Api\Places::index');
+$routes->get('api/places/(:segment)', 'Api\Places::show/$1');
+$routes->get('api/pilot', 'Api\Pilots::index');
+$routes->get('api/pilot/(:segment)', 'Api\Pilots::show/$1');
+
+$routes->group('api/', static function (RouteCollection $routes): void {
     $routes->get('search/airlines', 'Api\Airlines::search');
     $routes->get('search/airports', 'Api\Airports::search');
     $routes->get('search/routes', 'Api\Routes::search');
