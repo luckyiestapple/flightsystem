@@ -363,7 +363,7 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/api/pilot"
+            "url": "{{base_url}}/api/pilots"
           }
         },
         {
@@ -377,7 +377,7 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{base_url}}/api/pilot/{{pilot_id}}"
+            "url": "{{base_url}}/api/pilots/{{pilot_id}}"
           }
         },
         {

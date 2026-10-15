@@ -67,7 +67,7 @@ Endpoint Place dan Pilot meneruskan GET ke project terpisah:
 | Data | Collection | Detail |
 | --- | --- | --- |
 | Place | `/api/place/` | `/api/places/{id}` |
-| Pilot | `/api/pilot` | `/api/pilot/{id}` |
+| Pilot | `/api/pilots` | `/api/pilots/{id}` |
 
 `place_id` dan `pilot_id` pada flight menyimpan ID dari API eksternal. Ketika
 membaca flight, respons juga memuat detail terkait pada property `place` dan

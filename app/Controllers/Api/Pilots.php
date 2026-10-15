@@ -7,8 +7,8 @@ use Config\ExternalApis;
 final class Pilots extends ExternalResourceController
 {
     protected string $serviceName = 'Pilot';
-    protected string $collectionPath = 'api/pilot';
-    protected string $detailPath = 'api/pilot/';
+    protected string $collectionPath = 'api/pilots';
+    protected string $detailPath = 'api/pilots/';
 
     public function __construct()
     {

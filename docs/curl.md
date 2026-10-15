@@ -522,8 +522,8 @@ response JSON dan status HTTP diteruskan dari API asal.
 curl.exe -i -H "Accept: application/json" "$baseUrl/api/place/"
 curl.exe -i -H "Accept: application/json" "$baseUrl/api/places/$placeId"
 
-curl.exe -i -H "Accept: application/json" "$baseUrl/api/pilot"
-curl.exe -i -H "Accept: application/json" "$baseUrl/api/pilot/$pilotId"
+curl.exe -i -H "Accept: application/json" "$baseUrl/api/pilots"
+curl.exe -i -H "Accept: application/json" "$baseUrl/api/pilots/$pilotId"
 ```
 
 `$placeId` dan `$pilotId` dapat diambil dari property `id` pada data collection

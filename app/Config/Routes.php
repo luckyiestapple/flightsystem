@@ -7,8 +7,8 @@ $routes->get('/', 'Home::index');
 
 $routes->get('api/place', 'Api\Places::index');
 $routes->get('api/places/(:segment)', 'Api\Places::show/$1');
-$routes->get('api/pilot', 'Api\Pilots::index');
-$routes->get('api/pilot/(:segment)', 'Api\Pilots::show/$1');
+$routes->get('api/pilots', 'Api\Pilots::index');
+$routes->get('api/pilots/(:segment)', 'Api\Pilots::show/$1');
 
 $routes->group('api/', static function (RouteCollection $routes): void {
     $routes->get('search/airlines', 'Api\Airlines::search');

@@ -130,7 +130,7 @@ final class Flights extends ResourceController
 
         foreach ([
             'place' => [$apis->placeBaseUrl, 'place_id', 'api/places/'],
-            'pilot' => [$apis->pilotBaseUrl, 'pilot_id', 'api/pilot/'],
+            'pilot' => [$apis->pilotBaseUrl, 'pilot_id', 'api/pilots/'],
         ] as $resource => [$baseUrl, $idField, $detailPath]) {
             $id = $record[$idField] ?? null;
 

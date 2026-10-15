@@ -293,8 +293,8 @@ final class ApiResourceTest extends CIUnitTestCase
         $collectionResponse = $this->jsonResponse(['data' => [['id' => 'pilot-1']]]);
         $detailResponse = $this->jsonResponse(['data' => ['id' => 'pilot-1', 'name' => 'Pilot Test']]);
         $expectedUrls = [
-            'http://pilot.test/api/pilot',
-            'http://pilot.test/api/pilot/pilot-1',
+            'http://pilot.test/api/pilots',
+            'http://pilot.test/api/pilots/pilot-1',
         ];
         $responses = [$collectionResponse, $detailResponse];
         $requestIndex = 0;
@@ -309,14 +309,14 @@ final class ApiResourceTest extends CIUnitTestCase
         Services::injectMock('curlrequest', $client);
 
         try {
-            $collection = $this->get('/api/pilot');
+            $collection = $this->get('/api/pilots');
             $collection->assertStatus(200);
             $this->assertSame(
                 ['data' => [['id' => 'pilot-1']]],
                 json_decode($collection->getJSON(), true, 512, JSON_THROW_ON_ERROR),
             );
 
-            $detail = $this->get('/api/pilot/pilot-1');
+            $detail = $this->get('/api/pilots/pilot-1');
             $detail->assertStatus(200);
             $this->assertSame(
                 ['data' => ['id' => 'pilot-1', 'name' => 'Pilot Test']],
@@ -361,7 +361,7 @@ final class ApiResourceTest extends CIUnitTestCase
                     ]);
                 }
 
-                if ($url === 'http://pilot.test/api/pilot/' . $pilotId) {
+                if ($url === 'http://pilot.test/api/pilots/' . $pilotId) {
                     return $this->jsonResponse([
                         'status' => 200,
                         'data' => ['id' => $pilotId, 'name' => 'Pilot Test'],

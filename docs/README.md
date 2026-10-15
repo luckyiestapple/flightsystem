@@ -97,8 +97,8 @@ detail. Request delete menghapus record secara permanen.
 | `DELETE` | `/api/{resource}/{id}` | Menghapus record |
 | `GET` | `/api/place/` | Proxy daftar Place dari project Place |
 | `GET` | `/api/places/{id}` | Proxy detail Place dari project Place |
-| `GET` | `/api/pilot` | Proxy daftar Pilot dari project Pilot |
-| `GET` | `/api/pilot/{id}` | Proxy detail Pilot dari project Pilot |
+| `GET` | `/api/pilots` | Proxy daftar Pilot dari project Pilot |
+| `GET` | `/api/pilots/{id}` | Proxy detail Pilot dari project Pilot |
 
 Collection `GET` juga menerima query pencarian, filter, dan sorting yang sama
 dengan endpoint `/api/search/{resource}`.
@@ -107,8 +107,8 @@ dengan endpoint `/api/search/{resource}`.
 
 Endpoint Place dan Pilot di atas meneruskan GET ke project API yang terpisah.
 Daftar Place diteruskan ke `{api.place}/api/place/`, detail Place ke
-`{api.place}/api/places/{id}`, daftar Pilot ke `{api.pilot}/api/pilot`, dan
-detail Pilot ke `{api.pilot}/api/pilot/{id}`. Respons JSON dan status HTTP dari
+`{api.place}/api/places/{id}`, daftar Pilot ke `{api.pilot}/api/pilots`, dan
+detail Pilot ke `{api.pilot}/api/pilots/{id}`. Respons JSON dan status HTTP dari
 API asal diteruskan apa adanya. ID pada URL di-encode sebelum dikirim ke
 project asal.
 
